@@ -17,6 +17,9 @@ class MainActivity : AppCompatActivity() {
             layerAc.setOnClickListener {
                 startActivity(Intent(this@MainActivity, LayerTestActivity::class.java))
             }
+            memoryAc.setOnClickListener {
+                startActivity(Intent(this@MainActivity, MemoryActivity::class.java))
+            }
         }
     }
 }
