@@ -15,7 +15,7 @@ public class LengthOfLongestSubstring {
         int left = 0, right = 0;
         while(right < s.length()) {
             if(map.containsKey(s.charAt(right))) {
-                left = map.get(s.charAt(right)) + 1;
+                left = Math.max(map.get(s.charAt(right)) + 1, left);
             }
             maxSub = Math.max(maxSub, right - left + 1);
 
