@@ -34,5 +34,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/layerAc" />
 
+        <TextView
+            android:id="@+id/goVolume"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/cardview_dark_background"
+            android:gravity="center"
+            android:text="@string/goVolume"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/memoryAc" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

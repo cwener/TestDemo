@@ -1,4 +1,4 @@
-package com.example.test
+package com.example.test.activity
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +19,10 @@ class MainActivity : AppCompatActivity() {
             }
             memoryAc.setOnClickListener {
                 startActivity(Intent(this@MainActivity, MemoryActivity::class.java))
+            }
+
+            goVolume.setOnClickListener {
+                startActivity(Intent(this@MainActivity, VolumeTestActivity::class.java))
             }
         }
     }

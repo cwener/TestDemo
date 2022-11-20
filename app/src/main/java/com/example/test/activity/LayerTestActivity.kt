@@ -1,4 +1,4 @@
-package com.example.test
+package com.example.test.activity
 
 import android.os.Bundle
 import android.os.PersistableBundle
