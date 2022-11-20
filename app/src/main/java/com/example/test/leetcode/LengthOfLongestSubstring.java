@@ -1,7 +1,9 @@
 package com.example.test.leetcode;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author: chengwen
@@ -23,5 +25,22 @@ public class LengthOfLongestSubstring {
             right++;
         }
         return maxSub;
+    }
+
+    public static int lengthOfLongestSubstring2(String s) {
+        if(s == null || s.length() == 0) return 0;
+        Set<Character> set = new HashSet<>();
+        int left = 0, right = 0, max = 0;
+        while(right < s.length()) {
+            if(set.contains(s.charAt(right))) {
+                set.remove(s.charAt(left));
+                left++;
+            } else {
+                set.add(s.charAt(right));
+                max = Math.max(set.size(), max);
+                right++;
+            }
+        }
+        return max;
     }
 }

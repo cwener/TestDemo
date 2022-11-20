@@ -6,6 +6,6 @@ package com.example.test.leetcode;
  */
 public class Main {
     public static void main(String[] args) {
-        LongestPalindrome.longestPalindrome("babad");
+        LengthOfLongestSubstring.lengthOfLongestSubstring2("abcabcbb");
     }
 }
