@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.fragment.app.FragmentActivity
 import com.example.test.databinding.ActivityVolumeBinding
+import com.example.test.view.CircularVolumeDrawable
 import com.example.test.view.VolumeDrawable
 
 /**
@@ -13,14 +14,15 @@ import com.example.test.view.VolumeDrawable
 class VolumeTestActivity : FragmentActivity() {
 
     private val volumeDrawable = VolumeDrawable()
+    private val volumeDrawable2 = CircularVolumeDrawable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val binding = ActivityVolumeBinding.inflate(LayoutInflater.from(this))
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        binding.volumeImg.background = volumeDrawable
+        binding.volumeImg.background = volumeDrawable2
         binding.volumeImg.setOnClickListener {
-            volumeDrawable.volume = 0.1f
+            volumeDrawable2.volume = 0.1f
         }
     }
 }
