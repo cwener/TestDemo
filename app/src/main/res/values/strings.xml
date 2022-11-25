@@ -3,5 +3,6 @@
     <string name="go_layer">go Layer</string>
     <string name="go_memory">go Memory</string>
     <string name="goVolume">goVolume</string>
+    <string name="goTrans">goTrans</string>
     <string name="click_go_liveroom">点击进入直播间</string>
 </resources>

@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
+import com.example.test.activity.acoptionstest.ActivityA
 import com.example.test.databinding.ActivityLayerTestBinding
 
 class MainActivity : AppCompatActivity() {
@@ -23,6 +24,10 @@ class MainActivity : AppCompatActivity() {
 
             goVolume.setOnClickListener {
                 startActivity(Intent(this@MainActivity, VolumeTestActivity::class.java))
+            }
+
+            goTrans.setOnClickListener {
+                startActivity(Intent(this@MainActivity, ActivityA::class.java))
             }
         }
     }

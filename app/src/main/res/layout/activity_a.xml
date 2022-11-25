@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/shareImg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:transitionName="shareElement"
+            android:src="@drawable/page_bg"/>
+
+        <TextView
+            android:id="@+id/entrance"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:background="@color/teal_200"
+            android:gravity="center"
+            android:text="this is A" />
+
+    </FrameLayout>
+</layout>

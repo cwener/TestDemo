@@ -7,8 +7,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.148" />
         <entry key="app/src/main/res/drawable/swipe.xml" value="0.11" />
         <entry key="app/src/main/res/layout/ac_memory.xml" value="0.35144927536231885" />
+        <entry key="app/src/main/res/layout/activity_a.xml" value="0.328125" />
+        <entry key="app/src/main/res/layout/activity_b.xml" value="0.328125" />
         <entry key="app/src/main/res/layout/activity_layer_test.xml" value="0.35144927536231885" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.35144927536231885" />
         <entry key="app/src/main/res/layout/activity_volume.xml" value="0.13240740740740742" />
