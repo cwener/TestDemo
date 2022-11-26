@@ -3,6 +3,7 @@ package com.example.test.leetcode;
 /**
  * @author: chengwen
  * @date: 2022/11/20
+ * 最长回文子串
  */
 public class LongestPalindrome {
     public static String longestPalindrome(String s) {
