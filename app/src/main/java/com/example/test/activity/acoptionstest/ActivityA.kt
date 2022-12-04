@@ -21,8 +21,9 @@ class ActivityA: FragmentActivity() {
 //            val intent = Intent(this, ActivityB::class.java)
 //            startActivity(intent, bundle)
 
-            val intent = Intent(this, ActivityB::class.java)
-            startActivity(intent)
+            val intentB = Intent(this, ActivityB::class.java)
+            val intentC = Intent(this, ActivityC::class.java)
+            startActivities(arrayOf(intentB, intentC))
             overridePendingTransition(0, 0)
         }
         setContentView(binding.root)

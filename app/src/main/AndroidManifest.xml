@@ -25,6 +25,9 @@
         <activity android:name=".activity.VolumeTestActivity" />
         <activity android:name=".activity.acoptionstest.ActivityA" />
         <activity android:name=".activity.acoptionstest.ActivityB" />
+        <activity
+            android:name=".activity.acoptionstest.ActivityC"
+            android:theme="@style/AppTheme.TranslucentTheme" />
     </application>
 
 </manifest>
