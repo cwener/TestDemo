@@ -44,5 +44,24 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
+
+        <ImageView
+            android:id="@+id/cover"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/cover"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/mask"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/icon_alpha"
+            app:layout_constraintBottom_toBottomOf="@+id/cover"
+            app:layout_constraintEnd_toEndOf="@+id/cover"
+            app:layout_constraintStart_toStartOf="@+id/cover"
+            app:layout_constraintTop_toTopOf="@+id/cover" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

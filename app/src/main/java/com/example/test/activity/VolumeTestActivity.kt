@@ -31,5 +31,8 @@ class VolumeTestActivity : FragmentActivity() {
         binding.gotoLiveRoom.setOnClickListener {
             goRoomCountDownDrawable.total = 10 * 1000
         }
+//        val drawable = DrawableCompat.wrap(binding.mask.drawable).mutate()
+//        DrawableCompat.setTint(drawable, getColor(R.color.white))
+//        binding.mask.setImageDrawable(drawable)
     }
 }
