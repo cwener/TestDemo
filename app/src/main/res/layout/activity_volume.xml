@@ -63,5 +63,16 @@
             app:layout_constraintStart_toStartOf="@+id/cover"
             app:layout_constraintTop_toTopOf="@+id/cover" />
 
+
+        <com.example.test.view.MaskOverLayImageView
+            android:id="@+id/overlayMask"
+            android:layout_width="31dp"
+            android:layout_height="31dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="50dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mask" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
