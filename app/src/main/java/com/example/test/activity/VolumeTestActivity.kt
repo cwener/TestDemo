@@ -7,6 +7,11 @@ import com.example.test.databinding.ActivityVolumeBinding
 import com.example.test.view.CircularVolumeDrawable
 import com.example.test.view.GoRoomCountDownDrawable
 import com.example.test.view.VolumeDrawable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * @author: chengwen
@@ -30,6 +35,24 @@ class VolumeTestActivity : FragmentActivity() {
         binding.gotoLiveRoom.background = goRoomCountDownDrawable
         binding.gotoLiveRoom.setOnClickListener {
             goRoomCountDownDrawable.total = 10 * 1000
+        }
+        try {
+            try {
+                GlobalScope.launch(Dispatchers.IO) {
+                    throw Exception("Something went wrong!")
+                }
+            } catch (e: Exception) {
+                println("Caught exception: ${e.message}")
+            }
+            runBlocking(Dispatchers.IO) {
+                throw RuntimeException("Something went wrong!")
+                launch {
+                    delay(1000)
+                    throw Exception("Something went wrong!")
+                }
+            }
+        } catch (e: Exception) {
+            println("Caught exception: ${e.message}")
         }
 //        val drawable = DrawableCompat.wrap(binding.mask.drawable).mutate()
 //        DrawableCompat.setTint(drawable, getColor(R.color.white))

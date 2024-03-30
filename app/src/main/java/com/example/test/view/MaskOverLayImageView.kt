@@ -42,6 +42,8 @@ class MaskOverLayImageView: AppCompatImageView {
             paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
             canvas.drawBitmap(bitmap1, 0f, 0f, paint)
             setImageBitmap(bitmap3)
+            bitmap1.recycle()
+            bitmap2.recycle()
         }
     }
 }

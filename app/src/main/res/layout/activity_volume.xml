@@ -66,12 +66,20 @@
 
         <com.example.test.view.MaskOverLayImageView
             android:id="@+id/overlayMask"
-            android:layout_width="31dp"
-            android:layout_height="31dp"
+            android:layout_width="31.5dp"
+            android:layout_height="31.5dp"
             android:layout_marginStart="50dp"
             android:layout_marginTop="50dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mask" />
+
+        <ImageView
+            android:id="@+id/testRecycle"
+            android:layout_width="100dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_height="100dp"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
