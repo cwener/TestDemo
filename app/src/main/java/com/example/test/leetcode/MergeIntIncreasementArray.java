@@ -7,7 +7,7 @@ package com.example.test.leetcode;
  * 88. 合并两个有序数组
  * https://leetcode.cn/problems/merge-sorted-array/description/
  **/
-public class MergeIntIncreacementArray {
+public class MergeIntIncreasementArray {
     public static void merge(int[] nums1, int m, int[] nums2, int n) {
         if(nums1 == null || nums1.length == 0) return;
         if(nums2 == null || nums2.length == 0) return;

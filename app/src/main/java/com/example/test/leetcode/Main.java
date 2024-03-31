@@ -10,6 +10,6 @@ public class Main {
 //        TreeSum.threeSum(new int[]{-4, -1, -1, 0, 1, 2});
 //        int res = FindKthLargest.findKthLargest(new int[]{1}, 1);
 //        new Permute().permute(new int[]{1,2,3});
-        MergeIntIncreacementArray.merge(new int[]{1}, 1, new int[]{0}, 1);
+        MergeIntIncreasementArray.merge(new int[]{1}, 1, new int[]{0}, 1);
     }
 }
