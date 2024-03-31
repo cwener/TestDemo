@@ -8,6 +8,7 @@ public class Main {
     public static void main(String[] args) {
 //        LengthOfLongestSubstring.lengthOfLongestSubstring2("abcabcbb");
 //        TreeSum.threeSum(new int[]{-4, -1, -1, 0, 1, 2});
-        int res = Solution.findKthLargest(new int[]{1}, 1);
+//        int res = FindKthLargest.findKthLargest(new int[]{1}, 1);
+        new Permute().permute(new int[]{1,2,3});
     }
 }

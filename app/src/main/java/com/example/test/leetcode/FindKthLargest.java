@@ -6,7 +6,7 @@ package com.example.test.leetcode;
  * 找第k个最大的数
  * https://leetcode.cn/problems/maximum-subarray/
  **/
-class Solution {
+class FindKthLargest {
     public static int findKthLargest(int[] nums, int k) {
         if(nums == null || nums.length == 0 || k < 0 || k > nums.length) return -1;
         int partition = 0, start = 0, end = nums.length - 1;
