@@ -58,5 +58,29 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/goVolume" />
 
+        <TextView
+            android:id="@+id/goDialog"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/cardview_dark_background"
+            android:gravity="center"
+            android:text="@string/goDialog"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/goTrans" />
+
+        <TextView
+            android:id="@+id/goFontTest"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/cardview_dark_background"
+            android:gravity="center"
+            android:text="字体测试"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/goDialog" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

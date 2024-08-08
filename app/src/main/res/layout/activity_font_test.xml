@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.example.test.view.fonttest.ETextView
+            android:id="@+id/left"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:lineSpacingExtra="0dp"
+            android:background="@color/black_5"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.example.test.view.fonttest.ETextView
+            android:id="@+id/right"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:layout_marginStart="150dp"
+            android:textSize="12sp"
+            android:lineSpacingExtra="0dp"
+            app:layout_constraintStart_toStartOf="@+id/left"
+            app:layout_constraintTop_toTopOf="@+id/left" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

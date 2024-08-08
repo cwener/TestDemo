@@ -3,6 +3,20 @@
     <asm skipDebug="true" skipFrames="true" skipCode="false" expandFrames="false" />
     <groovy codeStyle="LEGACY" />
   </component>
+  <component name="AemServers">
+    <servers>
+      <aemServer>
+        <host>localhost</host>
+        <name>Author</name>
+        <port>4502</port>
+      </aemServer>
+      <aemServer>
+        <host>localhost</host>
+        <name>Publish</name>
+        <port>4503</port>
+      </aemServer>
+    </servers>
+  </component>
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
