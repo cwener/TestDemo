@@ -15,23 +15,58 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
+            android:background="@color/black_5"
+            android:lineSpacingExtra="5dp"
             android:textColor="@color/black"
             android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:lineSpacingExtra="0dp"
-            android:background="@color/black_5"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.example.test.view.fonttest.ETextView
             android:id="@+id/right"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
             android:layout_marginStart="150dp"
+            android:textColor="@color/black"
             android:textSize="12sp"
-            android:lineSpacingExtra="0dp"
-            app:layout_constraintStart_toStartOf="@+id/left"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/left" />
+
+        <com.example.test.view.fonttest.ETextView
+            android:id="@+id/abTestLeft"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="@color/black_5"
+            android:lineSpacingExtra="5dp"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/left" />
+
+        <com.example.test.view.fonttest.ETextView
+            android:id="@+id/abTestRight"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="150dp"
+            android:layout_marginTop="30dp"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/right" />
+
+        <TextView
+            android:id="@+id/testLine"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:background="@color/teal_200"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:lineHeight="18dp"
+            android:text="Swang多雷全新专辑《纽博格林Nurburgring》"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/abTestLeft" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

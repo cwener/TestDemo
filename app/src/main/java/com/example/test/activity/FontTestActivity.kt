@@ -18,7 +18,12 @@ class FontTestActivity: FragmentActivity() {
         val binding = ActivityFontTestBinding.inflate(LayoutInflater.from(this))
         setContentView(binding.root)
         binding.left.setCustomText("神秘歌友推荐你听《Cant Get Your Love》")
-        binding.left.setLineSpacing(DimensionUtils.dpToPxF(5f), 1f)
+//        binding.left.setLineSpacing(DimensionUtils.dpToPxF(5f), 1f)
+        binding.right.setCustomText("神秘歌友推荐你听《Cant Get Your Love》")
+//        binding.right.setLineSpacing(DimensionUtils.dpToPxF(5f), 1f)
+
+        binding.abTestLeft.text = "神秘歌友推荐你听《Cant Get Your Love》"
+        binding.abTestRight.text = "神秘歌友推荐你听《Cant Get Your Love》"
     }
 
 }
