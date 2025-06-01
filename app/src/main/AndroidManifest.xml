@@ -29,6 +29,7 @@
         <activity
             android:name=".activity.acoptionstest.ActivityC"
             android:theme="@style/AppTheme.TranslucentTheme" />
+        <activity android:name=".activity.land.LandActivity" android:screenOrientation="sensorLandscape"/>
     </application>
 
 </manifest>

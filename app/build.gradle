@@ -67,6 +67,14 @@ dependencies {
 //    implementation group: "com.tencent.matrix", name: "matrix-sqlite-lint-android-sdk", version: MATRIX_VERSION, changing: true
 //    implementation group: "com.tencent.matrix", name: "matrix-battery-canary", version: MATRIX_VERSION, changing: true
     implementation group: "com.tencent.matrix", name: "matrix-hooks", version: MATRIX_VERSION, changing: true
+
+    // Fresco依赖
+    implementation 'com.facebook.fresco:fresco:2.6.0'
+    // 如果需要支持GIF
+    implementation 'com.facebook.fresco:animated-gif:2.6.0'
+    // 如果需要支持WebP
+    implementation 'com.facebook.fresco:animated-webp:2.6.0'
+    implementation 'com.facebook.fresco:webpsupport:2.6.0'
 }
 
 apply plugin: 'com.tencent.matrix-plugin'

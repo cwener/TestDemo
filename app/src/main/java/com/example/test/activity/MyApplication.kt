@@ -1,6 +1,7 @@
 package com.example.test.activity
 
 import android.app.Application
+import com.facebook.drawee.backends.pipeline.Fresco
 
 /**
  * @author: chengwen
@@ -11,5 +12,6 @@ class MyApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         ApplicationWrapper.instance = this
+        Fresco.initialize(this)
     }
 }

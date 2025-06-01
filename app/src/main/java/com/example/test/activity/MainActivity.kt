@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.WindowManager
 import com.example.test.R
 import com.example.test.activity.acoptionstest.ActivityA
+import com.example.test.activity.land.LandActivity
 import com.example.test.databinding.ActivityLayerTestBinding
 import com.example.test.view.DSLNotificationDialog
 
@@ -42,6 +43,10 @@ class MainActivity : AppCompatActivity() {
 
             goFontTest.setOnClickListener {
                 startActivity(Intent(this@MainActivity, FontTestActivity::class.java))
+            }
+
+            goLandTest.setOnClickListener {
+                startActivity(Intent(this@MainActivity, LandActivity::class.java))
             }
         }
     }
