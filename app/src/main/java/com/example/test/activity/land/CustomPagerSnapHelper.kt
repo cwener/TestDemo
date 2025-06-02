@@ -1,9 +1,13 @@
 package com.example.test.activity.land
 
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
+import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import kotlin.math.abs
+import kotlin.math.max
 
 class CustomPagerSnapHelper : PagerSnapHelper() {
 
@@ -30,7 +34,7 @@ class CustomPagerSnapHelper : PagerSnapHelper() {
     ): IntArray? {
         val  res = super.calculateDistanceToFinalSnap(layoutManager, targetView)
         val pos = recyclerView?.getChildAdapterPosition(targetView)
-        Log.i(TAG, "calculateDistanceToFinalSnap res = ${res.contentToString()}, targetView pos = $pos, adapter curPos=${adapter?.currentPosition}")
+        Log.d(TAG, "calculateDistanceToFinalSnap res = ${res.contentToString()}, targetView pos = $pos, adapter curPos=${adapter?.currentPosition}")
         return res
     }
 
@@ -60,5 +64,42 @@ class CustomPagerSnapHelper : PagerSnapHelper() {
         Log.d("CustomPagerSnapHelper", "onFling, velocityX=$velocityX")
         // 确保只滑动一页
         return super.onFling(velocityX, velocityY)
+    }
+
+    override fun createSnapScroller(layoutManager: RecyclerView.LayoutManager?): LinearSmoothScroller? {
+        if (recyclerView == null) return super.createSnapScroller(layoutManager)
+        return object : LinearSmoothScroller(recyclerView?.context) {
+            override fun onTargetFound(
+                targetView: View,
+                state: RecyclerView.State,
+                action: Action
+            ) {
+                val snapDistances = calculateDistanceToFinalSnap(recyclerView?.layoutManager!!, targetView)
+                val dx = snapDistances!![0]
+                val dy = snapDistances[1]
+                val time = calculateTimeForDeceleration(max(abs(dx.toDouble()), abs(dy.toDouble())).toInt())
+                if (time > 0) {
+                    action.update(dx, dy, time, mDecelerateInterpolator)
+                    Log.d(TAG, "onTargetFound, time=$time, snapDistances=${snapDistances.contentToString()}, dx=$dx, adapter pos= ${adapter?.currentPosition}")
+                    adapter?.onTargetFound(dx, time)
+                }
+            }
+
+            override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
+                val res = 100f / displayMetrics.densityDpi
+                Log.d(TAG, "calculateSpeedPerPixel, time=$res, adapter pos= ${adapter?.currentPosition}")
+                return res
+            }
+
+            override fun calculateTimeForScrolling(dx: Int): Int {
+                val res = max(100.toDouble(), super.calculateTimeForScrolling(dx).toDouble()).toInt()
+                Log.d(TAG, "calculateTimeForScrolling, time=$res, adapter pos= ${adapter?.currentPosition}")
+                return res
+            }
+
+            override fun calculateTimeForDeceleration(dx: Int): Int {
+                return 1000
+            }
+        }
     }
 }
