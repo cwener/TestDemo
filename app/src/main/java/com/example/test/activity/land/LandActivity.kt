@@ -35,7 +35,7 @@ class LandActivity: FragmentActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         // 初始化适配器
-        adapter = MusicAdapter { music, position ->
+        adapter = MusicAdapter(recyclerView) { music, position ->
             // 处理item点击事件
             Toast.makeText(this, "Selected: ${music.title}", Toast.LENGTH_SHORT).show()
             val viewHolder = recyclerView.findViewHolderForAdapterPosition(position)
@@ -52,8 +52,6 @@ class LandActivity: FragmentActivity() {
         snapHelper.setAdapter(adapter)
         snapHelper.attachToRecyclerView(recyclerView)
 
-        // 添加自定义滚动监听器
-        recyclerView.addOnScrollListener(PageScrollListener(adapter))
         recyclerView.setPadding(MusicAdapter.LeftEdgeWidth, 0, 0, 0)
         recyclerView.clipToPadding = false
 

@@ -8,16 +8,19 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.example.test.R
 import com.example.test.databinding.ItemMusicBinding
 import com.example.test.utils.DimensionUtils
 import com.facebook.drawee.view.SimpleDraweeView
 
-class MusicAdapter(private val onItemClick: (MusicInfo, Int) -> Unit) : RecyclerView.Adapter<MusicAdapter.MusicViewHolder>() {
+class MusicAdapter(recyclerView: RecyclerView, private val onItemClick: (MusicInfo, Int) -> Unit) : RecyclerView.Adapter<MusicAdapter.MusicViewHolder>() {
 
     companion object {
         val LeftEdgeWidth = DimensionUtils.dpToPx(100f)
+        const val TAG = "MusicAdapter"
     }
 
     private val list = mutableListOf<MusicInfo>()
@@ -27,6 +30,29 @@ class MusicAdapter(private val onItemClick: (MusicInfo, Int) -> Unit) : Recycler
             Log.i("MusicAdapter", "old = ${field}, currentPosition=$value")
             field = value
         }
+
+    init {
+        recyclerView.addOnScrollListener(object : OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val currentPositionTmp = layoutManager.findFirstCompletelyVisibleItemPosition()
+
+                    if (currentPositionTmp != RecyclerView.NO_POSITION && currentPositionTmp != currentPosition) {
+                        // 位置变化了，处理动画
+                        currentPosition = currentPositionTmp
+                        onCurrentPositionChanged(recyclerView)
+                    }
+                }
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                Log.i(TAG, "onScrolled, dx=$dx")
+            }
+        })
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_music, parent, false)
