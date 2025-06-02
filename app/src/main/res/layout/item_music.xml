@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/material_dynamic_tertiary60"
-        android:padding="8dp">
+        android:paddingVertical="8dp">
 
         <!-- 使用Fresco的SimpleDraweeView替代ImageView -->
         <com.facebook.drawee.view.SimpleDraweeView

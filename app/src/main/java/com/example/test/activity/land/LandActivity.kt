@@ -1,18 +1,13 @@
 package com.example.test.activity.land
 
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SnapHelper
 import com.example.test.R
 import com.example.test.databinding.ActivityLandBinding
-import com.example.test.utils.DimensionUtils
 
 
 /**
@@ -50,17 +45,8 @@ class LandActivity: FragmentActivity() {
 
         // 添加自定义滚动监听器
         recyclerView.addOnScrollListener(PageScrollListener(adapter))
-
-        recyclerView.addItemDecoration(object : RecyclerView.ItemDecoration() {
-            override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-                val position = parent.getChildAdapterPosition(view)
-                if (position == 0) {
-                    outRect.left = DimensionUtils.dpToPx(100f)
-                } else {
-                    super.getItemOffsets(outRect, view, parent, state)
-                }
-            }
-        })
+        recyclerView.setPadding(MusicAdapter.LeftEdgeWidth, 0, 0, 0)
+        recyclerView.clipToPadding = false
 
 
         // 加载示例数据

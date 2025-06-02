@@ -16,6 +16,10 @@ import com.facebook.drawee.view.SimpleDraweeView
 
 class MusicAdapter(private val onItemClick: (MusicInfo) -> Unit) : RecyclerView.Adapter<MusicAdapter.MusicViewHolder>() {
 
+    companion object {
+        val LeftEdgeWidth = DimensionUtils.dpToPx(100f)
+    }
+
     private val list = mutableListOf<MusicInfo>()
     var currentPosition: Int = 0
         get() = field
@@ -27,6 +31,7 @@ class MusicAdapter(private val onItemClick: (MusicInfo) -> Unit) : RecyclerView.
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_music, parent, false)
         val binding = ItemMusicBinding.bind(view)
+        binding.root.layoutParams.width = (DimensionUtils.getFullScreenWidth() - LeftEdgeWidth).toInt()
         return MusicViewHolder(binding, onItemClick)
     }
 
@@ -80,10 +85,6 @@ class MusicAdapter(private val onItemClick: (MusicInfo) -> Unit) : RecyclerView.
         private val onItemClick: (MusicInfo) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         val imgCover: SimpleDraweeView = itemView.findViewById(R.id.imgCover)
-
-        init {
-            binding.root.layoutParams.width = (DimensionUtils.getFullScreenWidth() * 0.8f).toInt()
-        }
 
         fun bind(music: MusicInfo, position: Int) {
             updateImagePosition(binding.imgCover, position)
