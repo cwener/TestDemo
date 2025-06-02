@@ -55,17 +55,17 @@ class MusicAdapter(private val onItemClick: (MusicInfo, Int) -> Unit) : Recycler
 
     // 更新ImageView的位置
     fun updateImagePosition(imageView: ImageView, position: Int) {
-        val params = imageView.layoutParams as FrameLayout.LayoutParams
-        if (position < currentPosition) {
-            // 当前页之前的ViewHolder的ImageView居右对齐，且距右100dp
-            params.gravity = Gravity.END or Gravity.CENTER_VERTICAL
-            params.marginEnd = DimensionUtils.dpToPx(100f)
-        } else {
-            // 当前页及之后的ViewHolder的ImageView居左对齐
-            params.gravity = Gravity.START or Gravity.CENTER_VERTICAL
-            params.marginEnd = 0
-        }
-        imageView.layoutParams = params
+//        val params = imageView.layoutParams as FrameLayout.LayoutParams
+//        if (position < currentPosition) {
+//            // 当前页之前的ViewHolder的ImageView居右对齐，且距右100dp
+//            params.gravity = Gravity.END or Gravity.CENTER_VERTICAL
+//            params.marginEnd = DimensionUtils.dpToPx(100f)
+//        } else {
+//            // 当前页及之后的ViewHolder的ImageView居左对齐
+//            params.gravity = Gravity.START or Gravity.CENTER_VERTICAL
+//            params.marginEnd = 0
+//        }
+//        imageView.layoutParams = params
     }
 
     // 当当前位置变化时，更新所有可见的ViewHolder

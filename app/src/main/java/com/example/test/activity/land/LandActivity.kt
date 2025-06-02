@@ -40,7 +40,7 @@ class LandActivity: FragmentActivity() {
             Toast.makeText(this, "Selected: ${music.title}", Toast.LENGTH_SHORT).show()
             val viewHolder = recyclerView.findViewHolderForAdapterPosition(position)
             viewHolder?.let {
-                animateViewWidth(it.itemView)
+//                animateViewWidth(it.itemView)
             }
         }
 
