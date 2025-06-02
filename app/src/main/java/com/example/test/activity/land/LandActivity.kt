@@ -52,8 +52,7 @@ class LandActivity: FragmentActivity() {
         snapHelper.setAdapter(adapter)
         snapHelper.attachToRecyclerView(recyclerView)
 
-        recyclerView.setPadding(MusicAdapter.LeftEdgeWidth, 0, 0, 0)
-        recyclerView.clipToPadding = false
+        adapter.currentPosition = 0
 
 
         // 加载示例数据

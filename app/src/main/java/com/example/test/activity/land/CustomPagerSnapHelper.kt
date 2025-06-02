@@ -35,7 +35,9 @@ class CustomPagerSnapHelper : PagerSnapHelper() {
     }
 
     override fun calculateScrollDistance(velocityX: Int, velocityY: Int): IntArray? {
-        return super.calculateScrollDistance(velocityX, velocityY)
+        val res = super.calculateScrollDistance(velocityX, velocityY)
+        Log.i(TAG, "calculateScrollDistance res = ${res.contentToString()}, adapter curPos=${adapter?.currentPosition}")
+        return res
     }
 
     override fun findTargetSnapPosition(
@@ -48,9 +50,6 @@ class CustomPagerSnapHelper : PagerSnapHelper() {
         // 处理滑动方向和当前位置关系
         if (targetPosition != RecyclerView.NO_POSITION && targetPosition != lastPosition) {
             adapter?.currentPosition = targetPosition
-//            recyclerView?.let {
-//                adapter?.onCurrentPositionChanged(it)
-//            }
             lastPosition = targetPosition
         }
 
@@ -58,6 +57,7 @@ class CustomPagerSnapHelper : PagerSnapHelper() {
     }
 
     override fun onFling(velocityX: Int, velocityY: Int): Boolean {
+        Log.d("CustomPagerSnapHelper", "onFling, velocityX=$velocityX")
         // 确保只滑动一页
         return super.onFling(velocityX, velocityY)
     }
