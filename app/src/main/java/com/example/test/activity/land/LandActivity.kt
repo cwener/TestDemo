@@ -1,13 +1,19 @@
 package com.example.test.activity.land
 
-import MusicAdapter
+import android.graphics.Rect
 import android.os.Bundle
-import android.os.PersistableBundle
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
 import com.example.test.R
+import com.example.test.databinding.ActivityLandBinding
+import com.example.test.utils.DimensionUtils
+
 
 /**
  * @author ChengWen
@@ -20,7 +26,11 @@ class LandActivity: FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_land)
+        val binding = ActivityLandBinding.inflate(LayoutInflater.from(this))
+        setContentView(binding.root)
+        binding.imageDown.setOnClickListener {
+            Toast.makeText(this, "下层View响应点击", Toast.LENGTH_SHORT).show()
+        }
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
@@ -32,6 +42,26 @@ class LandActivity: FragmentActivity() {
 
         // 设置适配器
         recyclerView.adapter = adapter
+
+        // 应用 SnapHelper
+        val snapHelper = CustomPagerSnapHelper()
+        snapHelper.setAdapter(adapter)
+        snapHelper.attachToRecyclerView(recyclerView)
+
+        // 添加自定义滚动监听器
+        recyclerView.addOnScrollListener(PageScrollListener(adapter))
+
+        recyclerView.addItemDecoration(object : RecyclerView.ItemDecoration() {
+            override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+                val position = parent.getChildAdapterPosition(view)
+                if (position == 0) {
+                    outRect.left = DimensionUtils.dpToPx(100f)
+                } else {
+                    super.getItemOffsets(outRect, view, parent, state)
+                }
+            }
+        })
+
 
         // 加载示例数据
         loadMusicData()
