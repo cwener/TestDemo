@@ -14,7 +14,7 @@ import com.example.test.databinding.ItemMusicBinding
 import com.example.test.utils.DimensionUtils
 import com.facebook.drawee.view.SimpleDraweeView
 
-class MusicAdapter(private val onItemClick: (MusicInfo) -> Unit) : RecyclerView.Adapter<MusicAdapter.MusicViewHolder>() {
+class MusicAdapter(private val onItemClick: (MusicInfo, Int) -> Unit) : RecyclerView.Adapter<MusicAdapter.MusicViewHolder>() {
 
     companion object {
         val LeftEdgeWidth = DimensionUtils.dpToPx(100f)
@@ -82,7 +82,7 @@ class MusicAdapter(private val onItemClick: (MusicInfo) -> Unit) : RecyclerView.
 
     inner class MusicViewHolder(
         val binding: ItemMusicBinding,
-        private val onItemClick: (MusicInfo) -> Unit
+        private val onItemClick: (MusicInfo, Int) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         val imgCover: SimpleDraweeView = itemView.findViewById(R.id.imgCover)
 
@@ -96,7 +96,7 @@ class MusicAdapter(private val onItemClick: (MusicInfo) -> Unit) : RecyclerView.
             // 使用Fresco加载图片
             imgCover.setImageURI(music.coverUrl.toUri())
             imgCover.setOnClickListener {
-                onItemClick.invoke(music)
+                onItemClick.invoke(music, position)
             }
         }
     }

@@ -1,13 +1,18 @@
 package com.example.test.activity.land
 
+import android.animation.ValueAnimator
+import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
+import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.test.R
 import com.example.test.databinding.ActivityLandBinding
+import com.example.test.utils.DimensionUtils
 
 
 /**
@@ -30,9 +35,13 @@ class LandActivity: FragmentActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         // 初始化适配器
-        adapter = MusicAdapter { music ->
+        adapter = MusicAdapter { music, position ->
             // 处理item点击事件
             Toast.makeText(this, "Selected: ${music.title}", Toast.LENGTH_SHORT).show()
+            val viewHolder = recyclerView.findViewHolderForAdapterPosition(position)
+            viewHolder?.let {
+                animateViewWidth(it.itemView)
+            }
         }
 
         // 设置适配器
@@ -103,5 +112,36 @@ class LandActivity: FragmentActivity() {
 
         // 提交到适配器
         adapter.setList(musicList)
+    }
+
+    fun animateViewWidth(view: View) {
+        // 将dp转为像素
+
+        // 获取当前宽度（屏幕宽度）
+        val startWidth = view.width
+
+        val animator = ValueAnimator.ofInt(startWidth, DimensionUtils.dpToPx(300f))
+
+
+        // 设置弹性插值器
+        // 可以选择BounceInterpolator或SpringInterpolator实现弹性效果
+        animator.interpolator = OvershootInterpolator(0.7f)
+
+        // 或者使用弹簧效果
+        // animator.setInterpolator(new SpringInterpolator(0.4f)); // 需自定义
+        animator.addUpdateListener(object : AnimatorUpdateListener {
+            override fun onAnimationUpdate(animation: ValueAnimator) {
+                val value = animation.getAnimatedValue() as Int
+                // 重要：从右侧缩减宽度，需要调整layout参数
+                val layoutParams = view.layoutParams
+                layoutParams.width = value
+                view.setLayoutParams(layoutParams)
+                // 如果是在ConstraintLayout中，还可以设置右对齐
+                // 这样缩减时会保持右边界不变
+            }
+        })
+
+        animator.setDuration(500) // 动画持续时间，单位毫秒
+        animator.start()
     }
 }

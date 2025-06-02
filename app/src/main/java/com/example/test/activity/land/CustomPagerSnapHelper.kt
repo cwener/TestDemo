@@ -28,7 +28,7 @@ class CustomPagerSnapHelper : PagerSnapHelper() {
         Log.d("CustomPagerSnapHelper", "findTargetSnapPosition=$targetPosition")
         // 处理滑动方向和当前位置关系
         if (targetPosition != RecyclerView.NO_POSITION && targetPosition != lastPosition) {
-//            adapter?.currentPosition = targetPosition
+            adapter?.currentPosition = targetPosition
 //            recyclerView?.let {
 //                adapter?.onCurrentPositionChanged(it)
 //            }
