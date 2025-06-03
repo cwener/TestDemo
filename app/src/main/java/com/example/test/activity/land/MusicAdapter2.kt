@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.graphics.toColorInt
-import androidx.core.net.toUri
 import androidx.core.view.marginLeft
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,7 +15,6 @@ import com.example.test.utils.DimensionUtils
 import com.example.test.utils.setMarginLeft
 import com.example.test.utils.setMarginRight
 import com.example.test.utils.setMarginStart
-import com.facebook.drawee.view.SimpleDraweeView
 import kotlin.math.abs
 
 class MusicAdapter2(val recyclerView: RecyclerView, private val onItemClick: (MusicInfo, Int) -> Unit) : RecyclerView.Adapter<MusicAdapter2.MusicViewHolder>() {
