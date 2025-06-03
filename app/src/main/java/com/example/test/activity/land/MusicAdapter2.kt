@@ -5,12 +5,16 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
+import androidx.core.view.marginLeft
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.example.test.R
 import com.example.test.databinding.ItemMusicBinding
 import com.example.test.utils.DimensionUtils
 import com.example.test.utils.setMarginLeft
+import com.example.test.utils.setMarginRight
+import com.example.test.utils.setMarginStart
 import com.facebook.drawee.view.SimpleDraweeView
 import kotlin.math.abs
 
@@ -42,7 +46,13 @@ class MusicAdapter2(val recyclerView: RecyclerView, private val onItemClick: (Mu
     var smoothDirection = NONE_DIRECTION
     var toLeftOriginLeft = -1
 
-    init {
+    val adapterItemClick : (MusicInfo, Int) -> Unit = { music, pos ->
+        onItemClick.invoke(music, pos)
+    }
+
+    var interactiveStatus = ListState.SwitchMusic
+
+        init {
         recyclerView.addOnScrollListener(object : OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
@@ -53,45 +63,47 @@ class MusicAdapter2(val recyclerView: RecyclerView, private val onItemClick: (Mu
                 super.onScrolled(recyclerView, dx, dy)
                 Log.d("MusicAdapt", "onScrolled, dx=$dx, smoothDirection=$smoothDirection")
                 // smoothDirection 大于 0 时才是真正的改变了目标位置
-                when(smoothDirection) {
-                    TO_LEFT -> {
-                        val vh = recyclerView.findViewHolderForAdapterPosition(currentPosition) as? MusicViewHolder
-                        vh ?: return
-                        val left = vh.binding.root.left
-                        if (toLeftOriginLeft == INVALID_LEFT) {
-                            toLeftOriginLeft = left
+                if (interactiveStatus == ListState.SwitchMusic) {
+                    when(smoothDirection) {
+                        TO_LEFT -> {
+                            val vh = recyclerView.findViewHolderForAdapterPosition(currentPosition) as? MusicViewHolder
+                            vh ?: return
+                            val left = vh.binding.root.left
+                            if (toLeftOriginLeft == INVALID_LEFT) {
+                                toLeftOriginLeft = left
+                            }
+                            val margin = (BASIC_LEFT_SPACE * (1.0 - left.toFloat() / toLeftOriginLeft)).toInt()
+                            vh.binding.imgCover.setMarginLeft(margin)
+                            Log.d(TAG, "调整目标pos的marginLeft=$margin")
                         }
-                        val margin = (BASIC_LEFT_SPACE * (1.0 - left.toFloat() / toLeftOriginLeft)).toInt()
-                        vh.binding.imgCover.setMarginLeft(margin)
-                        Log.d(TAG, "调整目标pos的marginLeft=$margin")
-                    }
-                    TO_RIGHT -> {
-                        val vh = recyclerView.findViewHolderForAdapterPosition(currentPosition) as? MusicViewHolder
-                        vh ?: return
-                        val left = abs(vh.binding.root.left)
-                        if (toLeftOriginLeft == INVALID_LEFT) {
-                            toLeftOriginLeft = left
+                        TO_RIGHT -> {
+                            val vh = recyclerView.findViewHolderForAdapterPosition(currentPosition) as? MusicViewHolder
+                            vh ?: return
+                            val left = abs(vh.binding.root.left)
+                            if (toLeftOriginLeft == INVALID_LEFT) {
+                                toLeftOriginLeft = left
+                            }
+                            val margin = (BASIC_RIGHT_SPACE * (left.toFloat() / toLeftOriginLeft)).toInt() + BASIC_LEFT_SPACE
+                            vh.binding.imgCover.setMarginLeft(margin)
+                            Log.d(TAG, "调整目标pos的marginLeft=$margin")
                         }
-                        val margin = (BASIC_RIGHT_SPACE * (left.toFloat() / toLeftOriginLeft)).toInt() + BASIC_LEFT_SPACE
-                        vh.binding.imgCover.setMarginLeft(margin)
-                        Log.d(TAG, "调整目标pos的marginLeft=$margin")
-                    }
-                    else ->  {
-                        val vh = recyclerView.findViewHolderForAdapterPosition(currentPosition) as? MusicViewHolder
-                        vh?.let {
-                            renderMargin(currentPosition, it.binding, currentPosition, RecyclerView.SCROLL_STATE_IDLE)
-                        }
+                        else ->  {
+                            val vh = recyclerView.findViewHolderForAdapterPosition(currentPosition) as? MusicViewHolder
+                            vh?.let {
+                                renderMargin(currentPosition, it.binding, currentPosition, RecyclerView.SCROLL_STATE_IDLE)
+                            }
 
-                        val pre = currentPosition - 1
-                        val vhPre = recyclerView.findViewHolderForAdapterPosition(pre) as? MusicViewHolder
-                        vhPre?.let {
-                            renderMargin(position = pre, it.binding, curPosition = currentPosition, RecyclerView.SCROLL_STATE_IDLE)
-                        }
+                            val pre = currentPosition - 1
+                            val vhPre = recyclerView.findViewHolderForAdapterPosition(pre) as? MusicViewHolder
+                            vhPre?.let {
+                                renderMargin(position = pre, it.binding, curPosition = currentPosition, RecyclerView.SCROLL_STATE_IDLE)
+                            }
 
-                        val next = currentPosition + 1
-                        val vhNext = recyclerView.findViewHolderForAdapterPosition(next) as? MusicViewHolder
-                        vhNext?.let {
-                            renderMargin(position = next, it.binding, curPosition = currentPosition, RecyclerView.SCROLL_STATE_IDLE)
+                            val next = currentPosition + 1
+                            val vhNext = recyclerView.findViewHolderForAdapterPosition(next) as? MusicViewHolder
+                            vhNext?.let {
+                                renderMargin(position = next, it.binding, curPosition = currentPosition, RecyclerView.SCROLL_STATE_IDLE)
+                            }
                         }
                     }
                 }
@@ -102,13 +114,47 @@ class MusicAdapter2(val recyclerView: RecyclerView, private val onItemClick: (Mu
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_music, parent, false)
         val binding = ItemMusicBinding.bind(view)
-        return MusicViewHolder(binding, onItemClick)
+        return MusicViewHolder(binding, adapterItemClick)
     }
 
     fun setList(musics: List<MusicInfo>) {
         list.clear()
         list.addAll(musics)
         notifyDataSetChanged()
+    }
+
+    fun renderTransToList(animatedValue: Float) {
+        for (i in 0 until recyclerView.childCount) {
+            val child = recyclerView.getChildAt(i)
+            val vh = recyclerView.findContainingViewHolder(child) as? MusicViewHolder
+            vh ?: continue
+            val position = recyclerView.getChildAdapterPosition(child)
+            if (position == currentPosition) {
+                if (animatedValue > 0.95) {
+                    vh.binding.root.layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
+                    vh.binding.imgCover.setMarginLeft(BASIC_LEFT_SPACE)
+                    vh.binding.imgCover.setMarginRight(BASIC_RIGHT_SPACE)
+                } else if (animatedValue < 0.1f) {
+                    if (vh.binding.root.width != BASIC_ITEM_WIDTH) {
+                        vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH
+                    }
+                    if (vh.binding.imgCover.marginLeft != BASIC_SPACE) {
+                        vh.binding.imgCover.setMarginLeft(BASIC_SPACE)
+                    }
+                    (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, BASIC_LEFT_SPACE)
+                } else {
+                    vh.binding.imgCover.setMarginStart((BASIC_LEFT_SPACE * animatedValue).toInt())
+                    vh.binding.imgCover.setMarginRight((BASIC_RIGHT_SPACE * animatedValue).toInt())
+                }
+            } else {
+                if (vh.binding.root.width != BASIC_ITEM_WIDTH) {
+                    vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH
+                }
+                if (vh.binding.imgCover.marginLeft != BASIC_SPACE) {
+                    vh.binding.imgCover.setMarginLeft(BASIC_SPACE)
+                }
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: MusicViewHolder, position: Int) {
@@ -148,23 +194,32 @@ class MusicAdapter2(val recyclerView: RecyclerView, private val onItemClick: (Mu
     }
 
     fun renderMargin(position: Int, binding: ItemMusicBinding, curPosition: Int, scrollState: Int) {
-        when(scrollState) {
-            RecyclerView.SCROLL_STATE_IDLE -> {
-                if (position == curPosition) {
-                    binding.imgCover.setMarginLeft(BASIC_LEFT_SPACE)
-                    binding.root.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
-                } else if (position < curPosition) {
-                    binding.imgCover.setMarginLeft(DimensionUtils.getFullScreenWidth() - DimensionUtils.dpToPx(300f))
-                } else {
-                    binding.imgCover.setMarginLeft(0)
-                    binding.root.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+        if (interactiveStatus == ListState.SwitchMusic) {
+            when(scrollState) {
+                RecyclerView.SCROLL_STATE_IDLE -> {
+                    if (position == curPosition) {
+                        binding.imgCover.setMarginLeft(BASIC_LEFT_SPACE)
+                        binding.root.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+                    } else if (position < curPosition) {
+                        binding.imgCover.setMarginLeft(DimensionUtils.getFullScreenWidth() - DimensionUtils.dpToPx(300f))
+                    } else {
+                        binding.imgCover.setMarginLeft(0)
+                        binding.root.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+                    }
+                }
+                RecyclerView.SCROLL_STATE_SETTLING -> {
+
+                }
+                RecyclerView.SCROLL_STATE_DRAGGING -> {
+
                 }
             }
-            RecyclerView.SCROLL_STATE_SETTLING -> {
-
+        } else if (interactiveStatus == ListState.ListCompletely) {
+            if (binding.root.width != BASIC_ITEM_WIDTH) {
+                binding.root.layoutParams.width = BASIC_ITEM_WIDTH
             }
-            RecyclerView.SCROLL_STATE_DRAGGING -> {
-
+            if (binding.imgCover.marginLeft != BASIC_SPACE) {
+                binding.imgCover.setMarginLeft(BASIC_SPACE)
             }
         }
     }

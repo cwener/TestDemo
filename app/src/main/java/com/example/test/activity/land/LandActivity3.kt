@@ -1,11 +1,17 @@
 package com.example.test.activity.land
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.test.R
+import com.example.test.activity.ApplicationWrapper
 import com.example.test.databinding.ActivityLandBinding
 
 
@@ -17,6 +23,8 @@ import com.example.test.databinding.ActivityLandBinding
 class LandActivity3: FragmentActivity() {
 
     private lateinit var adapter: MusicAdapter2
+    private lateinit var recyclerView: TouchInterceptorRecyclerView
+    private val snapHelper = CustomPagerSnapHelper2()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,16 +33,15 @@ class LandActivity3: FragmentActivity() {
         binding.imageDown.setOnClickListener {
             Toast.makeText(this, "下层View响应点击", Toast.LENGTH_SHORT).show()
         }
-        val recyclerView = findViewById<TouchInterceptorRecyclerView>(R.id.recyclerView)
+        recyclerView = findViewById<TouchInterceptorRecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         // 初始化适配器
         adapter = MusicAdapter2(recyclerView) { music, position ->
             // 处理item点击事件
-            Toast.makeText(this, "Selected: ${music.title}", Toast.LENGTH_SHORT).show()
-            val viewHolder = recyclerView.findViewHolderForAdapterPosition(position)
-            viewHolder?.let {
-//                animateViewWidth(it.itemView)
+            Toast.makeText(ApplicationWrapper.instance, "Selected: ${music.title}", Toast.LENGTH_SHORT).show()
+            if (position == adapter.currentPosition) {
+                transStatus(ListState.TransToList)
             }
         }
 
@@ -42,7 +49,6 @@ class LandActivity3: FragmentActivity() {
         recyclerView.adapter = adapter
 
         // 应用 SnapHelper
-        val snapHelper = CustomPagerSnapHelper2()
         snapHelper.setAdapter(adapter)
         snapHelper.attachToRecyclerView(recyclerView)
 
@@ -50,6 +56,46 @@ class LandActivity3: FragmentActivity() {
 
         // 加载示例数据
         loadMusicData()
+    }
+
+    // 列表转场
+    fun transStatus(status: Int) {
+        adapter.interactiveStatus = status
+        when(status) {
+            ListState.SwitchMusic -> {
+                snapHelper.attachToRecyclerView(recyclerView)
+            }
+            ListState.TransToList -> {
+                snapHelper.attachToRecyclerView(null)
+                val animator = ValueAnimator.ofFloat(1f, 0f).apply {
+                    // 设置动画时长为1秒
+                    this.duration = duration
+                    // 使用AccelerateDecelerateInterpolator实现先加速后减速效果
+                    interpolator = AccelerateDecelerateInterpolator()
+                    // 添加更新监听器，在动画的每一帧更新视图位置
+                    addUpdateListener { animator ->
+                        // 获取当前动画值
+                        val animatedValue = animator.animatedValue as Float
+                        adapter.renderTransToList(animatedValue)
+                    }
+                    addListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            super.onAnimationEnd(animation)
+                            transStatus(ListState.ListCompletely)
+                        }
+                    })
+                }
+                // 启动动画
+                animator.start()
+            }
+            ListState.ListCompletely -> {
+
+            }
+            ListState.ListTransToSwitch -> {
+
+            }
+        }
+        Log.d(MusicAdapter2.TAG, "transStatus=$status")
     }
 
 
