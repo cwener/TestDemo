@@ -7,17 +7,17 @@
     </data>
 
     <FrameLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/material_dynamic_tertiary60"
-        android:paddingVertical="8dp">
+        android:padding="8dp">
 
         <!-- 使用Fresco的SimpleDraweeView替代ImageView -->
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/imgCover"
             android:layout_width="300dp"
             android:layout_height="300dp"
-            android:layout_marginStart="@dimen/margin_100dp"
+            fresco:roundAsCircle="true"
             android:background="@color/teal_200"
             fresco:actualImageScaleType="centerCrop"
             fresco:roundedCornerRadius="4dp" />

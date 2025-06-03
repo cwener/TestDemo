@@ -17,6 +17,14 @@ class TouchInterceptorRecyclerView @JvmOverloads constructor(
     private var activeImageView: ImageView? = null
     private val tempRect = Rect()
 
+    init {
+        addOnScrollListener(object : OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+        })
+    }
+
 //    override fun onInterceptTouchEvent(e: MotionEvent): Boolean {
 //        // 检查点击位置是否在当前可见的某个ImageView上
 //        val x = e.x
