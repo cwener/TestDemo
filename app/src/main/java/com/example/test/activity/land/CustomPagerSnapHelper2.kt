@@ -36,6 +36,7 @@ class CustomPagerSnapHelper2 : PagerSnapHelper() {
         val  res = super.calculateDistanceToFinalSnap(layoutManager, targetView)
         val pos = recyclerView?.getChildAdapterPosition(targetView)
         Log.d(TAG, "calculateDistanceToFinalSnap res = ${res.contentToString()}, targetView pos = $pos, adapter curPos=${adapter?.currentPosition}")
+        adapter?.calculateDistanceToFinalSnap(res)
         return res
     }
 
@@ -93,7 +94,7 @@ class CustomPagerSnapHelper2 : PagerSnapHelper() {
             }
 
             override fun calculateTimeForScrolling(dx: Int): Int {
-                val res = min(300.toDouble(), super.calculateTimeForScrolling(dx).toDouble()).toInt()
+                val res = min(200.toDouble(), super.calculateTimeForScrolling(dx).toDouble()).toInt()
                 Log.d(TAG, "calculateTimeForScrolling, time=$res, adapter pos= ${adapter?.currentPosition}")
                 return res
             }

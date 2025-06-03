@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.test.R
 import com.example.test.activity.acoptionstest.ActivityA
 import com.example.test.activity.land.LandActivity2
+import com.example.test.activity.land.LandActivity3
 import com.example.test.databinding.ActivityLayerTestBinding
 import com.example.test.view.DSLNotificationDialog
 
@@ -43,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             goLandTest.setOnClickListener {
-                startActivity(Intent(this@MainActivity, LandActivity2::class.java))
+                startActivity(Intent(this@MainActivity, LandActivity3::class.java))
             }
         }
     }
