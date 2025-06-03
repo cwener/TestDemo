@@ -12,15 +12,26 @@
         android:background="@color/material_dynamic_tertiary60">
 
         <!-- 使用Fresco的SimpleDraweeView替代ImageView -->
-        <com.facebook.drawee.view.SimpleDraweeView
+        <FrameLayout
             android:id="@+id/imgCover"
             android:layout_width="300dp"
             android:layout_height="300dp"
-            fresco:roundAsCircle="true"
-            android:layout_marginStart="100dp"
-            android:background="@color/teal_200"
-            fresco:actualImageScaleType="centerCrop"
-            fresco:roundedCornerRadius="4dp" />
+            android:layout_marginStart="100dp">
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/teal_200"
+                fresco:actualImageScaleType="centerCrop"
+                fresco:roundAsCircle="true"
+                fresco:roundedCornerRadius="4dp" />
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </FrameLayout>
 
     </FrameLayout>
 </layout>

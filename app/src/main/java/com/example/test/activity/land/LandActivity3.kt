@@ -24,7 +24,8 @@ class LandActivity3: FragmentActivity() {
 
     private lateinit var adapter: MusicAdapter2
     private lateinit var recyclerView: TouchInterceptorRecyclerView
-    private val snapHelper = CustomPagerSnapHelper2()
+    private val pageSnapHelper = CustomPagerSnapHelper2()
+    private val leftOffsetSnapHelper = LeftOffsetSnapHelper(MusicAdapter2.BASIC_LEFT_SPACE)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +50,8 @@ class LandActivity3: FragmentActivity() {
         recyclerView.adapter = adapter
 
         // 应用 SnapHelper
-        snapHelper.setAdapter(adapter)
-        snapHelper.attachToRecyclerView(recyclerView)
+        pageSnapHelper.setAdapter(adapter)
+        pageSnapHelper.attachToRecyclerView(recyclerView)
 
         adapter.currentPosition = 0
 
@@ -61,12 +62,16 @@ class LandActivity3: FragmentActivity() {
     // 列表转场
     fun transStatus(status: Int) {
         adapter.interactiveStatus = status
+
+        pageSnapHelper.attachToRecyclerView(null)
+        leftOffsetSnapHelper.attachToRecyclerView(null)
+
         when(status) {
             ListState.SwitchMusic -> {
-                snapHelper.attachToRecyclerView(recyclerView)
+                pageSnapHelper.attachToRecyclerView(recyclerView)
             }
             ListState.TransToList -> {
-                snapHelper.attachToRecyclerView(null)
+                pageSnapHelper.attachToRecyclerView(null)
                 val animator = ValueAnimator.ofFloat(1f, 0f).apply {
                     // 设置动画时长为1秒
                     this.duration = duration
@@ -89,7 +94,7 @@ class LandActivity3: FragmentActivity() {
                 animator.start()
             }
             ListState.ListCompletely -> {
-
+                leftOffsetSnapHelper.attachToRecyclerView(recyclerView)
             }
             ListState.ListTransToSwitch -> {
 
@@ -140,6 +145,48 @@ class LandActivity3: FragmentActivity() {
             ),
             MusicInfo(
                 id = "7",
+                coverUrl = "http://p2.music.126.net/wcLyz1Cf111MWz9Odg0iRw==/109951164975030169.jpg",
+                title = "Bad Guy",
+                artist = "Billie Eilish"
+            ),
+            MusicInfo(
+                id = "8",
+                coverUrl = "http://p1.music.126.net/xXuvLXSk1RcD1Dx5JInIiw==/109951169612265280.jpg",
+                title = "Shape of You",
+                artist = "Ed Sheeran"
+            ),
+            MusicInfo(
+                id = "9",
+                coverUrl = "http://p1.music.126.net/73Acuw1l7Wc7Q98-FkIwBw==/109951168224246420.jpg",
+                title = "Blinding Lights",
+                artist = "The Weeknd"
+            ),
+            MusicInfo(
+                id = "10",
+                coverUrl = "http://p1.music.126.net/pHD15yOuVKvRy0xmlNaKww==/109951167386107088.jpg",
+                title = "Dance Monkey",
+                artist = "Tones and I"
+            ),
+            MusicInfo(
+                id = "11",
+                coverUrl = "http://p2.music.126.net/5k_BRr3vUfjJq97LQaj3jQ==/109951166583357991.jpg",
+                title = "Someone You Loved",
+                artist = "Lewis Capaldi"
+            ),
+            MusicInfo(
+                id = "12",
+                coverUrl = "http://p2.music.126.net/iN7OUPkcavI2MBSG8pf2jw==/109951170600632372.jpg",
+                title = "Bad Guy",
+                artist = "Billie Eilish"
+            ),
+            MusicInfo(
+                id = "13",
+                coverUrl = "http://p2.music.126.net/oiXnXrU6XJ9cIQe_3ii2YQ==/5923069139090882.jpg",
+                title = "Bad Guy",
+                artist = "Billie Eilish"
+            ),
+            MusicInfo(
+                id = "14",
                 coverUrl = "http://p2.music.126.net/wcLyz1Cf111MWz9Odg0iRw==/109951164975030169.jpg",
                 title = "Bad Guy",
                 artist = "Billie Eilish"

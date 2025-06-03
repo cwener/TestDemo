@@ -2,6 +2,7 @@ package com.example.test.activity.land
 
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
@@ -228,7 +229,7 @@ class MusicAdapter2(val recyclerView: RecyclerView, private val onItemClick: (Mu
         val binding: ItemMusicBinding,
         private val onItemClick: (MusicInfo, Int) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
-        val imgCover: SimpleDraweeView = itemView.findViewById(R.id.imgCover)
+        val imgCover: View = itemView.findViewById(R.id.imgCover)
 
         fun bind(music: MusicInfo, position: Int) {
             renderMargin(position, binding, currentPosition, RecyclerView.SCROLL_STATE_IDLE)
@@ -237,8 +238,8 @@ class MusicAdapter2(val recyclerView: RecyclerView, private val onItemClick: (Mu
             } else {
                 binding.root.setBackgroundColor("#66605A7C".toColorInt())
             }
+            binding.name.text = music.id
             // 使用Fresco加载图片
-            imgCover.setImageURI(music.coverUrl.toUri())
             imgCover.setOnClickListener {
                 onItemClick.invoke(music, position)
             }
