@@ -90,23 +90,22 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                             Log.d(TAG, "调整目标pos的marginLeft=$margin")
                         }
                         else ->  {
-                            val vh = recyclerView.findViewHolderForAdapterPosition(currentPosition) as? MusicViewHolder
-                            vh?.let {
-                                renderMargin(currentPosition, it.binding, currentPosition, RecyclerView.SCROLL_STATE_IDLE)
-                            }
-
-                            val pre = currentPosition - 1
-                            val vhPre = recyclerView.findViewHolderForAdapterPosition(pre) as? MusicViewHolder
-                            vhPre?.let {
-                                renderMargin(position = pre, it.binding, curPosition = currentPosition, RecyclerView.SCROLL_STATE_IDLE)
-                            }
-
-                            val next = currentPosition + 1
-                            val vhNext = recyclerView.findViewHolderForAdapterPosition(next) as? MusicViewHolder
-                            vhNext?.let {
-                                renderMargin(position = next, it.binding, curPosition = currentPosition, RecyclerView.SCROLL_STATE_IDLE)
+                            for (i in 0 until recyclerView.childCount) {
+                                val child = recyclerView.getChildAt(i)
+                                val vh = recyclerView.findContainingViewHolder(child) as? MusicViewHolder
+                                vh ?: continue
+                                val position = recyclerView.getChildAdapterPosition(child)
+                                renderMargin(position = position, vh.binding, curPosition = currentPosition, RecyclerView.SCROLL_STATE_IDLE)
                             }
                         }
+                    }
+                } else if (interactiveStatus == ListState.ListCompletely) {
+                    for (i in 0 until recyclerView.childCount) {
+                        val child = recyclerView.getChildAt(i)
+                        val vh = recyclerView.findContainingViewHolder(child) as? MusicViewHolder
+                        vh ?: continue
+                        val position = recyclerView.getChildAdapterPosition(child)
+                        renderMargin(position = position, vh.binding, curPosition = currentPosition, RecyclerView.SCROLL_STATE_IDLE)
                     }
                 }
             }
