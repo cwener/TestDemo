@@ -73,24 +73,19 @@ class LandActivity3: FragmentActivity() {
             ListState.TransToList -> {
                 pageSnapHelper.attachToRecyclerView(null)
                 val animator = ValueAnimator.ofFloat(1f, 0f).apply {
-                    // 设置动画时长为1秒
-                    this.duration = duration
-                    // 使用AccelerateDecelerateInterpolator实现先加速后减速效果
-                    interpolator = AccelerateDecelerateInterpolator()
-                    // 添加更新监听器，在动画的每一帧更新视图位置
                     addUpdateListener { animator ->
-                        // 获取当前动画值
-                        val animatedValue = animator.animatedValue as Float
-                        adapter.renderTransToList(animatedValue)
+                        val currentWidth = animator.animatedValue as Float
+                        adapter.renderTransToList(currentWidth)
                     }
+                    duration = 500
+                    interpolator = AccelerateDecelerateInterpolator()
                     addListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator?) {
-                            super.onAnimationEnd(animation)
+                        override fun onAnimationEnd(animation: Animator) {
                             transStatus(ListState.ListCompletely)
                         }
                     })
                 }
-                // 启动动画
+
                 animator.start()
             }
             ListState.ListCompletely -> {

@@ -14,10 +14,9 @@ import com.example.test.databinding.ItemMusicBinding
 import com.example.test.utils.DimensionUtils
 import com.example.test.utils.setMarginLeft
 import com.example.test.utils.setMarginRight
-import com.example.test.utils.setMarginStart
 import kotlin.math.abs
 
-class MusicAdapter2(val recyclerView: RecyclerView, private val onItemClick: (MusicInfo, Int) -> Unit) : RecyclerView.Adapter<MusicAdapter2.MusicViewHolder>() {
+class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val onItemClick: (MusicInfo, Int) -> Unit) : RecyclerView.Adapter<MusicAdapter2.MusicViewHolder>() {
 
     companion object {
         val BASIC_RIGHT_SPACE = DimensionUtils.getFullScreenWidth() - DimensionUtils.dpToPx(400f)
@@ -51,7 +50,11 @@ class MusicAdapter2(val recyclerView: RecyclerView, private val onItemClick: (Mu
 
     var interactiveStatus = ListState.SwitchMusic
 
-        init {
+    init {
+        recyclerView.onChildAttachedToWindow = { child ->
+            val position = recyclerView.getChildAdapterPosition(child)
+            Log.d(TAG, "onChildAttachedToWindow, position=$position")
+        }
         recyclerView.addOnScrollListener(object : OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
@@ -129,22 +132,18 @@ class MusicAdapter2(val recyclerView: RecyclerView, private val onItemClick: (Mu
             vh ?: continue
             val position = recyclerView.getChildAdapterPosition(child)
             if (position == currentPosition) {
-                if (animatedValue > 0.95) {
-                    vh.binding.root.layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
-                    vh.binding.imgCover.setMarginLeft(BASIC_LEFT_SPACE)
-                    vh.binding.imgCover.setMarginRight(BASIC_RIGHT_SPACE)
-                } else if (animatedValue < 0.1f) {
-                    if (vh.binding.root.width != BASIC_ITEM_WIDTH) {
-                        vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH
-                    }
-                    if (vh.binding.imgCover.marginLeft != BASIC_SPACE) {
-                        vh.binding.imgCover.setMarginLeft(BASIC_SPACE)
-                    }
-                    (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, BASIC_LEFT_SPACE)
+                val width = (DimensionUtils.getFullScreenWidth() * animatedValue).toInt()
+                if (width < BASIC_ITEM_WIDTH) {
+                    vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH
                 } else {
-                    vh.binding.imgCover.setMarginStart((BASIC_LEFT_SPACE * animatedValue).toInt())
-                    vh.binding.imgCover.setMarginRight((BASIC_RIGHT_SPACE * animatedValue).toInt())
+                    vh.binding.root.layoutParams.width = width
                 }
+                val leftMargin = (BASIC_LEFT_SPACE * animatedValue).toInt()
+                vh.binding.imgCover.setMarginLeft(if (leftMargin < BASIC_SPACE) BASIC_SPACE else leftMargin)
+                vh.binding.imgCover.setMarginRight(BASIC_SPACE)
+                val scrollDistance = BASIC_LEFT_SPACE - leftMargin
+                (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, scrollDistance)
+                Log.d(TAG, "scrollDistance=${scrollDistance}")
             } else {
                 if (vh.binding.root.width != BASIC_ITEM_WIDTH) {
                     vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH
