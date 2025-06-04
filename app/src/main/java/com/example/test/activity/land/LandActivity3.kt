@@ -12,7 +12,9 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.test.R
 import com.example.test.activity.ApplicationWrapper
+import com.example.test.activity.land.MusicAdapter2.Companion.BASIC_LEFT_SPACE
 import com.example.test.databinding.ActivityLandBinding
+import com.example.test.utils.smoothScrollToPositionWithOffset
 
 
 /**
@@ -41,9 +43,14 @@ class LandActivity3: FragmentActivity() {
         adapter = MusicAdapter2(recyclerView) { music, position ->
             // 处理item点击事件
             Toast.makeText(ApplicationWrapper.instance, "Selected: ${music.title}", Toast.LENGTH_SHORT).show()
-            if (position == adapter.currentPosition) {
-                transStatus(ListState.TransToList)
+            if (adapter.interactiveStatus == ListState.SwitchMusic) {
+                if (position == adapter.currentPosition) {
+                    transStatus(ListState.TransToList, position)
+                }
+            } else if (adapter.interactiveStatus == ListState.ListCompletely) {
+                transStatus(ListState.ListTransToSwitch, position)
             }
+
         }
 
         // 设置适配器
@@ -60,7 +67,7 @@ class LandActivity3: FragmentActivity() {
     }
 
     // 列表转场
-    fun transStatus(status: Int) {
+    fun transStatus(status: Int, clickPos: Int) {
         adapter.interactiveStatus = status
 
         pageSnapHelper.attachToRecyclerView(null)
@@ -81,7 +88,7 @@ class LandActivity3: FragmentActivity() {
                     interpolator = AccelerateDecelerateInterpolator()
                     addListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
-                            transStatus(ListState.ListCompletely)
+                            transStatus(ListState.ListCompletely, clickPos)
                         }
                     })
                 }
@@ -92,7 +99,13 @@ class LandActivity3: FragmentActivity() {
                 leftOffsetSnapHelper.attachToRecyclerView(recyclerView)
             }
             ListState.ListTransToSwitch -> {
-
+                Log.d(MusicAdapter2.TAG, "smoothScrollToPositionWithOffset started")
+                recyclerView.smoothScrollToPositionWithOffset(clickPos, BASIC_LEFT_SPACE, onScrollStarted = {
+                    Log.d(MusicAdapter2.TAG, "smoothScrollToPositionWithOffset started")
+                }, onScrollFinished = {
+                    Log.d(MusicAdapter2.TAG, "smoothScrollToPositionWithOffset finished")
+                    // TODO:
+                })
             }
         }
         Log.d(MusicAdapter2.TAG, "transStatus=$status")
