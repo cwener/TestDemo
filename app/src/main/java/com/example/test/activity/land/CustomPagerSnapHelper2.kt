@@ -83,7 +83,7 @@ class CustomPagerSnapHelper2 : PagerSnapHelper() {
                 if (time > 0) {
                     action.update(dx, dy, time, mDecelerateInterpolator)
                     Log.d(TAG, "onTargetFound, time=$time, snapDistances=${snapDistances.contentToString()}, dx=$dx, adapter pos= ${adapter?.currentPosition}")
-                    adapter?.onTargetFound(dx, time)
+                    adapter?.onTargetFound(dx)
                 }
             }
 
