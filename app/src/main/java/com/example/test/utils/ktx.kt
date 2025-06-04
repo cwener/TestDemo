@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.absoluteValue
+import kotlin.random.Random
 
 fun RecyclerView.smoothScrollToPositionWithOffset(position: Int, offset: Int = 100, onScrollStarted: (() -> Unit)? = null, onScrollFinished: (() -> Unit)? = null) {
     // 创建自定义的SmoothScroller
@@ -76,4 +77,30 @@ fun RecyclerView.smoothScrollToPositionWithOffset(position: Int, offset: Int = 1
 
     // 开始平滑滚动
     layoutManager?.startSmoothScroll(smoothScroller)
+}
+
+
+fun generateRandomHexColor(seed: Long, previousColor: String? = null): String {
+    val random = Random(seed)
+    var newColor: String
+
+    // 定义一个生成随机颜色的方法
+    fun generateColor(): String {
+        val r = random.nextInt(256)
+        val g = random.nextInt(256)
+        val b = random.nextInt(256)
+        return String.format("#%02X%02X%02X", r, g, b)
+    }
+
+    // 如果没有之前的颜色，直接生成一个新的颜色
+    if (previousColor == null) {
+        newColor = generateColor()
+    } else {
+        // 否则，确保生成的颜色与之前的颜色不同
+        do {
+            newColor = generateColor()
+        } while (newColor == previousColor)
+    }
+
+    return newColor
 }

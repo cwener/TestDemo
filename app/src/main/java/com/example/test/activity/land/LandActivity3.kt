@@ -4,6 +4,8 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -27,7 +29,8 @@ class LandActivity3: FragmentActivity() {
     private lateinit var adapter: MusicAdapter2
     private lateinit var recyclerView: TouchInterceptorRecyclerView
     private val pageSnapHelper = CustomPagerSnapHelper2()
-    private val leftOffsetSnapHelper = LeftOffsetSnapHelper(MusicAdapter2.BASIC_LEFT_SPACE)
+    private val leftOffsetSnapHelper = LeftOffsetSnapHelper(BASIC_LEFT_SPACE)
+    private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,12 +46,13 @@ class LandActivity3: FragmentActivity() {
         adapter = MusicAdapter2(recyclerView) { music, position ->
             // 处理item点击事件
             Toast.makeText(ApplicationWrapper.instance, "Selected: ${music.title}", Toast.LENGTH_SHORT).show()
+            adapter.currentPosition = position
             if (adapter.interactiveStatus == ListState.SwitchMusic) {
                 if (position == adapter.currentPosition) {
                     transStatus(ListState.TransToList, position)
                 }
             } else if (adapter.interactiveStatus == ListState.ListCompletely) {
-                transStatus(ListState.ListTransToSwitch, position)
+                transStatus(ListState.ListTransToSwitchScrollToTarget, position)
             }
 
         }
@@ -98,13 +102,23 @@ class LandActivity3: FragmentActivity() {
             ListState.ListCompletely -> {
                 leftOffsetSnapHelper.attachToRecyclerView(recyclerView)
             }
-            ListState.ListTransToSwitch -> {
+            ListState.ListTransToSwitchScrollToTarget -> {
                 Log.d(MusicAdapter2.TAG, "smoothScrollToPositionWithOffset started")
                 recyclerView.smoothScrollToPositionWithOffset(clickPos, BASIC_LEFT_SPACE, onScrollStarted = {
                     Log.d(MusicAdapter2.TAG, "smoothScrollToPositionWithOffset started")
                 }, onScrollFinished = {
                     Log.d(MusicAdapter2.TAG, "smoothScrollToPositionWithOffset finished")
-                    // TODO:
+                    transStatus(ListState.ListTransToSwitchFadeExit, adapter.currentPosition)
+                })
+            }
+            ListState.ListTransToSwitchFadeExit -> {
+                adapter.renderTransToSwitch(onScrollFinished = {
+                    handler.postDelayed(object : Runnable {
+                        override fun run() {
+                            transStatus(ListState.SwitchMusic, clickPos)
+                        }
+
+                    }, 500)
                 })
             }
         }
