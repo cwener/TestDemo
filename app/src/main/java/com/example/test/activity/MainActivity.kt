@@ -6,10 +6,10 @@ import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import com.example.test.R
 import com.example.test.activity.acoptionstest.ActivityA
-import com.example.test.activity.land.LandActivity2
 import com.example.test.activity.land.LandActivity3
 import com.example.test.databinding.ActivityLayerTestBinding
 import com.example.test.view.DSLNotificationDialog
+import com.facebook.drawee.backends.pipeline.Fresco
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Fresco.initialize(this)
         setContentView(binding.root)
         binding.apply {
             layerAc.setOnClickListener {

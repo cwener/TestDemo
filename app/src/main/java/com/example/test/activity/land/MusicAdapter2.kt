@@ -235,6 +235,7 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
             } else {
                 binding.root.setBackgroundColor("#66605A7C".toColorInt())
             }
+            binding.cover.setImageURI(music.coverUrl)
             binding.name.text = music.id
             // 使用Fresco加载图片
             imgCover.setOnClickListener {
