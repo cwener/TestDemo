@@ -29,7 +29,14 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 
-fun RecyclerView.smoothScrollToPositionWithOffset(position: Int, offset: Int = 100, onScrollStarted: (() -> Unit)? = null, onScrolled: ((dx: Int) -> Unit)? = null, onScrollFinished: (() -> Unit)? = null) {
+fun RecyclerView.smoothScrollToPositionWithOffset(position: Int, offset: Int = 100, orientation: Int = RecyclerView.HORIZONTAL, onScrolled: ((dx: Int) -> Unit)? = null, onScrollFinished: (() -> Unit)? = null) {
+    val vh = findViewHolderForAdapterPosition(position)
+    vh ?: return
+    if ((orientation == RecyclerView.HORIZONTAL && vh.itemView.left == offset) || (orientation == RecyclerView.VERTICAL && vh.itemView.top == offset)) {
+        // 当前已经在目标位置和距离
+        onScrollFinished?.invoke()
+        return
+    }
     // 创建自定义的SmoothScroller
     val smoothScroller = object : LinearSmoothScroller(this.context) {
         private val MILLISECONDS_PER_INCH = 25f // 控制滚动速度
@@ -44,8 +51,8 @@ fun RecyclerView.smoothScrollToPositionWithOffset(position: Int, offset: Int = 1
 
         override fun onTargetFound(targetView: View, state: RecyclerView.State, action: Action) {
             val layoutManager = layoutManager as LinearLayoutManager
-            val childStart = targetView.left
-            val parentStart = layoutManager.paddingLeft
+            val childStart = if (orientation == RecyclerView.HORIZONTAL) targetView.left else targetView.top
+            val parentStart = if (orientation == RecyclerView.HORIZONTAL) layoutManager.paddingLeft else layoutManager.paddingTop
             val dx = childStart - parentStart - offset
             val time = calculateTimeForDeceleration(dx.absoluteValue)
             if (time > 0) {
