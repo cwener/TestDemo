@@ -106,6 +106,11 @@ class LandActivity3: FragmentActivity() {
                 Log.d(MusicAdapter2.TAG, "smoothScrollToPositionWithOffset started")
                 recyclerView.smoothScrollToPositionWithOffset(clickPos, BASIC_LEFT_SPACE, onScrollStarted = {
                     Log.d(MusicAdapter2.TAG, "smoothScrollToPositionWithOffset started")
+                }, onScrolled = {
+                    for (i in 0 until recyclerView.childCount) {
+                        val child = recyclerView.getChildAt(i)
+                        adapter.setScaleAndAlpha(child)
+                    }
                 }, onScrollFinished = {
                     Log.d(MusicAdapter2.TAG, "smoothScrollToPositionWithOffset finished")
                     transStatus(ListState.ListTransToSwitchFadeExit, adapter.currentPosition)

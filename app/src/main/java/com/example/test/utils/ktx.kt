@@ -21,6 +21,7 @@ package com.example.test.utils
  */
 import android.graphics.PointF
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
@@ -28,7 +29,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 
-fun RecyclerView.smoothScrollToPositionWithOffset(position: Int, offset: Int = 100, onScrollStarted: (() -> Unit)? = null, onScrollFinished: (() -> Unit)? = null) {
+fun RecyclerView.smoothScrollToPositionWithOffset(position: Int, offset: Int = 100, onScrollStarted: (() -> Unit)? = null, onScrolled: ((dx: Int) -> Unit)? = null, onScrollFinished: (() -> Unit)? = null) {
     // 创建自定义的SmoothScroller
     val smoothScroller = object : LinearSmoothScroller(this.context) {
         private val MILLISECONDS_PER_INCH = 25f // 控制滚动速度
@@ -66,6 +67,12 @@ fun RecyclerView.smoothScrollToPositionWithOffset(position: Int, offset: Int = 1
                 // 移除滚动监听器
                 recyclerView.removeOnScrollListener(this)
             }
+        }
+
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            onScrolled?.invoke(dx)
+            Log.d("smoothScrollToPositionWithOffset", "dx=$dx")
         }
     }
 

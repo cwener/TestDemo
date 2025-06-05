@@ -100,26 +100,30 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                     // 遍历所有可见的ViewHolder
                     for (i in 0 until recyclerView.childCount) {
                         val child = recyclerView.getChildAt(i)
-                        val vh = recyclerView.getChildViewHolder(child) as? MusicViewHolder
-                        vh ?: continue
-                        if (child.left >= BASIC_LEFT_SPACE) {
-                            // 计算当前item相对于RecyclerView左边的位置
-                            val scale = 0.9f + 0.1f * (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE - child.left) / BASIC_ITEM_WIDTH
-                            // 应用缩放
-                            vh.binding.imgCover.scaleX = scale
-                            vh.binding.imgCover.scaleY = scale
-                            vh.binding.root.alpha = 1f
-                        } else {
-                            var alpha = 1f + 0.4f * (child.left - BASIC_LEFT_SPACE) / (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE)
-                            var scale = 1f + 0.1f * (child.left - BASIC_LEFT_SPACE) / (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE)
-                            vh.binding.imgCover.scaleX = scale
-                            vh.binding.imgCover.scaleY = scale
-                            vh.binding.root.alpha = alpha
-                        }
+                        setScaleAndAlpha(child)
                     }
                 }
             }
         })
+    }
+
+    fun setScaleAndAlpha(child: View) {
+        val vh = recyclerView.getChildViewHolder(child) as? MusicViewHolder
+        vh ?: return
+        if (child.left >= BASIC_LEFT_SPACE) {
+            // 计算当前item相对于RecyclerView左边的位置
+            val scale = 0.9f + 0.1f * (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE - child.left) / BASIC_ITEM_WIDTH
+            // 应用缩放
+            vh.binding.imgCover.scaleX = scale
+            vh.binding.imgCover.scaleY = scale
+            vh.binding.root.alpha = 1f
+        } else {
+            var alpha = 1f + 0.4f * (child.left - BASIC_LEFT_SPACE) / (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE)
+            var scale = 1f + 0.1f * (child.left - BASIC_LEFT_SPACE) / (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE)
+            vh.binding.imgCover.scaleX = scale
+            vh.binding.imgCover.scaleY = scale
+            vh.binding.root.alpha = alpha
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicViewHolder {
