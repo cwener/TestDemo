@@ -132,6 +132,17 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
         return MusicViewHolder(binding, adapterItemClick)
     }
 
+
+    // 第0个在完全列表态时，宽度与其他不一致，因此全程所有态都不参与列表复用机制
+    override fun getItemViewType(position: Int): Int {
+        return if (position == 0) {
+            100
+        } else {
+            super.getItemViewType(position)
+        }
+    }
+
+
     fun setList(musics: List<MusicInfo>) {
         list.clear()
         list.addAll(musics)
@@ -146,17 +157,26 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
             val position = recyclerView.getChildAdapterPosition(child)
             if (position == currentPosition) {
                 val width = (DimensionUtils.getFullScreenWidth() * animatedValue).toInt()
-                if (width < BASIC_ITEM_WIDTH) {
-                    vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH
+                if (position == 0) {
+                    if (width < BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE) {
+                        vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE
+                    } else {
+                        vh.binding.root.layoutParams.width = width
+                    }
+                    vh.binding.imgCover.setMarginLeft(BASIC_LEFT_SPACE)
                 } else {
-                    vh.binding.root.layoutParams.width = width
+                    if (width < BASIC_ITEM_WIDTH) {
+                        vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH
+                    } else {
+                        vh.binding.root.layoutParams.width = width
+                    }
+                    val leftMargin = (BASIC_LEFT_SPACE * animatedValue).toInt()
+                    vh.binding.imgCover.setMarginLeft(if (leftMargin < BASIC_SPACE) BASIC_SPACE else leftMargin)
+                    vh.binding.imgCover.setMarginRight(BASIC_SPACE)
+                    val scrollDistance = BASIC_LEFT_SPACE - leftMargin
+                    (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, scrollDistance)
+                    Log.d(TAG, "scrollDistance=${scrollDistance}")
                 }
-                val leftMargin = (BASIC_LEFT_SPACE * animatedValue).toInt()
-                vh.binding.imgCover.setMarginLeft(if (leftMargin < BASIC_SPACE) BASIC_SPACE else leftMargin)
-                vh.binding.imgCover.setMarginRight(BASIC_SPACE)
-                val scrollDistance = BASIC_LEFT_SPACE - leftMargin
-                (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, scrollDistance)
-                Log.d(TAG, "scrollDistance=${scrollDistance}")
             } else {
                 if (vh.binding.root.width != BASIC_ITEM_WIDTH) {
                     vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH
@@ -240,11 +260,14 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
             }
             ListState.ListCompletely -> {
                 binding.root.alpha = 1f
-                if (binding.root.width != BASIC_ITEM_WIDTH) {
-                    binding.root.layoutParams.width = BASIC_ITEM_WIDTH
-                }
-                if (binding.imgCover.marginLeft != BASIC_SPACE) {
-                    binding.imgCover.setMarginLeft(BASIC_SPACE)
+                if (position != 0) {
+                    // 第0个始终保持进入列表完全态的样式。宽度略大，内部有marginLeft
+                    if (binding.root.width != BASIC_ITEM_WIDTH) {
+                        binding.root.layoutParams.width = BASIC_ITEM_WIDTH
+                    }
+                    if (binding.imgCover.marginLeft != BASIC_SPACE) {
+                        binding.imgCover.setMarginLeft(BASIC_SPACE)
+                    }
                 }
             }
             ListState.TransToList -> {
