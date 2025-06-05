@@ -17,6 +17,7 @@ import com.example.test.utils.setMarginLeft
 import com.example.test.utils.setMarginRight
 import kotlin.math.abs
 
+
 class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val onItemClick: (MusicInfo, Int) -> Unit) : RecyclerView.Adapter<MusicAdapter2.MusicViewHolder>() {
 
     companion object {
@@ -93,6 +94,27 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                             val margin = (BASIC_RIGHT_SPACE * (left.toFloat() / toLeftOriginLeft)).toInt() + BASIC_LEFT_SPACE
                             vh.binding.imgCover.setMarginLeft(margin)
                             Log.d(TAG, "调整目标pos的marginLeft=$margin")
+                        }
+                    }
+                } else if (interactiveStatus == ListState.ListCompletely) {
+                    // 遍历所有可见的ViewHolder
+                    for (i in 0 until recyclerView.childCount) {
+                        val child = recyclerView.getChildAt(i)
+                        val vh = recyclerView.getChildViewHolder(child) as? MusicViewHolder
+                        vh ?: continue
+                        if (child.left >= BASIC_LEFT_SPACE) {
+                            // 计算当前item相对于RecyclerView左边的位置
+                            val scale = 0.9f + 0.1f * (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE - child.left) / BASIC_ITEM_WIDTH
+                            // 应用缩放
+                            vh.binding.imgCover.scaleX = scale
+                            vh.binding.imgCover.scaleY = scale
+                            vh.binding.root.alpha = 1f
+                        } else {
+                            var alpha = 1f + 0.4f * (child.left - BASIC_LEFT_SPACE) / (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE)
+                            var scale = 1f + 0.1f * (child.left - BASIC_LEFT_SPACE) / (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE)
+                            vh.binding.imgCover.scaleX = scale
+                            vh.binding.imgCover.scaleY = scale
+                            vh.binding.root.alpha = alpha
                         }
                     }
                 }
@@ -200,6 +222,8 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
         when(interactiveStatus) {
             ListState.SwitchMusic -> {
                 binding.root.alpha = 1f
+                binding.imgCover.scaleX = 1f
+                binding.imgCover.scaleY = 1f
                 if (position == curPosition) {
                     binding.imgCover.setMarginLeft(BASIC_LEFT_SPACE)
                     binding.root.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
@@ -246,6 +270,8 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                 } else {
                     binding.root.alpha = 0f
                 }
+                binding.imgCover.scaleX = 1f
+                binding.imgCover.scaleY = 1f
                 (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, 0)
             }
         }

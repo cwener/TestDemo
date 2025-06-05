@@ -8,8 +8,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/material_dynamic_tertiary60">
+        android:layout_height="wrap_content">
 
         <!-- 使用Fresco的SimpleDraweeView替代ImageView -->
         <FrameLayout
