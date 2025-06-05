@@ -197,6 +197,14 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                     vh.binding.imgCover.setMarginLeft(BASIC_SPACE)
                 }
             }
+            // 遍历所有可见的ViewHolder
+            for (i in 0 until recyclerView.childCount) {
+                val child = recyclerView.getChildAt(i)
+                val position = recyclerView.getChildAdapterPosition(child)
+                if (position != currentPosition) {
+                    setScaleAndAlpha(child)
+                }
+            }
         }
     }
 
@@ -278,6 +286,13 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                     }
                     if (binding.imgCover.marginLeft != BASIC_SPACE) {
                         binding.imgCover.setMarginLeft(BASIC_SPACE)
+                    }
+                } else {
+                    if (binding.root.width != (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE)) {
+                        binding.root.layoutParams.width = BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE
+                    }
+                    if (binding.imgCover.marginLeft != BASIC_LEFT_SPACE) {
+                        binding.imgCover.setMarginLeft(BASIC_LEFT_SPACE)
                     }
                 }
             }
