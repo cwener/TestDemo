@@ -95,6 +95,18 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                             vh.binding.imgCover.setMarginLeft(margin)
                             Log.d(TAG, "调整目标pos的marginLeft=$margin")
                         }
+
+                        else -> {
+                            for (i in 0 until recyclerView.childCount) {
+                                val child = recyclerView.getChildAt(i)
+                                val position = recyclerView.getChildAdapterPosition(child)
+                                val vh = recyclerView.findViewHolderForAdapterPosition(position) as? MusicViewHolder
+                                vh?.let {
+                                    Log.d(TAG, "onChildAttachedToWindow, position=$position")
+                                    fixWidthAndMargin(position, it.binding, currentPosition)
+                                }
+                            }
+                        }
                     }
                 } else if (interactiveStatus == ListState.ListCompletely) {
                     // 遍历所有可见的ViewHolder
@@ -248,14 +260,13 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                 binding.root.alpha = 1f
                 binding.imgCover.scaleX = 1f
                 binding.imgCover.scaleY = 1f
+                binding.root.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
                 if (position == curPosition) {
                     binding.imgCover.setMarginLeft(BASIC_LEFT_SPACE)
-                    binding.root.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
                 } else if (position < curPosition) {
                     binding.imgCover.setMarginLeft(DimensionUtils.getFullScreenWidth() - DimensionUtils.dpToPx(300f))
                 } else {
                     binding.imgCover.setMarginLeft(0)
-                    binding.root.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
                 }
             }
             ListState.ListCompletely -> {
