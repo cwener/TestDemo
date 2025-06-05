@@ -41,7 +41,6 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
             lastCurrentPosition = field
             Log.i("MusicAdapter", "old = ${field}, currentPosition=$value")
             field = value
-            recyclerView.invalidateItemDecorations()
         }
     var smoothDirection = NONE_DIRECTION
     var toLeftOriginLeft = -1

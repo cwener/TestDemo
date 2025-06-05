@@ -34,8 +34,13 @@ class CustomPagerSnapHelper2 : PagerSnapHelper() {
         targetView: View
     ): IntArray? {
         val  res = super.calculateDistanceToFinalSnap(layoutManager, targetView)
-        val pos = recyclerView?.getChildAdapterPosition(targetView)
-        Log.d(TAG, "calculateDistanceToFinalSnap res = ${res.contentToString()}, targetView pos = $pos, adapter curPos=${adapter?.currentPosition}")
+        val targetPosition = recyclerView?.getChildAdapterPosition(targetView)
+        // 处理滑动方向和当前位置关系
+        if (res?.get(0) != 0 && targetPosition != null && targetPosition != RecyclerView.NO_POSITION && targetPosition != lastPosition) {
+            adapter?.currentPosition = targetPosition
+            lastPosition = targetPosition
+        }
+        Log.d(TAG, "calculateDistanceToFinalSnap res = ${res.contentToString()}, targetView pos = $targetPosition, adapter curPos=${adapter?.currentPosition}")
         adapter?.calculateDistanceToFinalSnap(res)
         return res
     }
@@ -53,12 +58,6 @@ class CustomPagerSnapHelper2 : PagerSnapHelper() {
     ): Int {
         val targetPosition = super.findTargetSnapPosition(layoutManager, velocityX, velocityY)
         Log.d("CustomPagerSnapHelper", "findTargetSnapPosition=$targetPosition")
-        // 处理滑动方向和当前位置关系
-        if (targetPosition != RecyclerView.NO_POSITION && targetPosition != lastPosition) {
-            adapter?.currentPosition = targetPosition
-            lastPosition = targetPosition
-        }
-
         return targetPosition
     }
 
