@@ -52,6 +52,7 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
     var interactiveStatus = ListState.SwitchMusic
 
     init {
+        recyclerView.setHandleImageViewId(R.id.imgCover)
         recyclerView.onChildAttachedToWindow = { child ->
             val position = recyclerView.getChildAdapterPosition(child)
             val vh = recyclerView.findViewHolderForAdapterPosition(position) as? MusicViewHolder
