@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:fresco="http://schemas.android.com/apk/res-auto">
 
     <data>
 
     </data>
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -15,22 +16,37 @@
             android:id="@+id/imgCover"
             android:layout_width="300dp"
             android:layout_height="300dp"
-            android:layout_marginStart="100dp">
+            android:layout_marginStart="100dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <com.facebook.drawee.view.SimpleDraweeView
                 android:id="@+id/cover"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/teal_200"
                 fresco:actualImageScaleType="centerCrop"
                 fresco:roundAsCircle="true" />
-
-            <TextView
-                android:id="@+id/name"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
         </FrameLayout>
 
-    </FrameLayout>
+        <com.example.test.activity.land.CircleTouchView
+            android:id="@+id/clickDelegateSpace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/imgCover"
+            app:layout_constraintEnd_toEndOf="@+id/imgCover"
+            app:layout_constraintStart_toStartOf="@+id/imgCover"
+            app:layout_constraintTop_toTopOf="@+id/imgCover" />
+
+        <TextView
+            android:id="@+id/name"
+            app:layout_constraintBottom_toBottomOf="@+id/imgCover"
+            app:layout_constraintEnd_toEndOf="@+id/imgCover"
+            app:layout_constraintStart_toStartOf="@+id/imgCover"
+            app:layout_constraintTop_toTopOf="@+id/imgCover"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

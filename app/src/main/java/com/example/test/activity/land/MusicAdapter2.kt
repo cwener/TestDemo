@@ -4,8 +4,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.graphics.toColorInt
 import androidx.core.view.marginLeft
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
@@ -52,7 +54,7 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
     var interactiveStatus = ListState.SwitchMusic
 
     init {
-        recyclerView.setHandleImageViewId(R.id.imgCover)
+        recyclerView.setHandleImageViewId(R.id.clickDelegateSpace)
         recyclerView.onChildAttachedToWindow = { child ->
             val position = recyclerView.getChildAdapterPosition(child)
             val vh = recyclerView.findViewHolderForAdapterPosition(position) as? MusicViewHolder
@@ -339,19 +341,30 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
         val binding: ItemMusicBinding,
         private val onItemClick: (MusicInfo, Int) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
-        val imgCover: View = itemView.findViewById(R.id.imgCover)
         val colorMap = mutableMapOf<String, String>()
+
+        init {
+            binding.clickDelegateSpace.updateLayoutParams {
+                width = BASIC_ITEM_WIDTH
+                height = BASIC_ITEM_WIDTH
+            }
+        }
+
         fun bind(music: MusicInfo, position: Int) {
             fixWidthAndMargin(position, binding, currentPosition)
             if (!colorMap.contains(music.id)) {
                 colorMap.put(music.id, generateRandomHexColor(music.id.toLong()))
             }
-            binding.cover.setBackgroundColor(colorMap[music.id]?.toColorInt() ?: "#66605A7C".toColorInt())
-            binding.cover.setImageURI(music.coverUrl)
+            binding.clickDelegateSpace.setBackgroundColor(colorMap[music.id]?.toColorInt() ?: "#66605A7C".toColorInt())
             binding.name.text = (music.id.toInt() - 1).toString()
-            // 使用Fresco加载图片
-            imgCover.setOnClickListener {
+            binding.clickDelegateSpace.onCircleInClickListener = {
                 onItemClick.invoke(music, position)
+            }
+            binding.clickDelegateSpace.onCircleInLongClickListener = {
+                onItemClick.invoke(music, position)
+            }
+            binding.clickDelegateSpace.onCircleOutClickListener = {
+                Toast.makeText(binding.root.context, "onCircleOutClickListener", Toast.LENGTH_SHORT).show()
             }
         }
     }
