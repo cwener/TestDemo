@@ -36,14 +36,21 @@ class LandActivity2: FragmentActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         // 初始化适配器
-        adapter = MusicAdapter2(recyclerView) { music, position ->
+        adapter = MusicAdapter2(recyclerView, onCircleInItemClick = { music, position ->
             // 处理item点击事件
             Toast.makeText(this, "Selected: ${music.title}", Toast.LENGTH_SHORT).show()
             val viewHolder = recyclerView.findViewHolderForAdapterPosition(position)
             viewHolder?.let {
 //                animateViewWidth(it.itemView)
             }
-        }
+        }, onItemCircleOutClick = { music, position ->
+            // 处理item点击事件
+            Toast.makeText(this, "Selected: ${music.title}", Toast.LENGTH_SHORT).show()
+            val viewHolder = recyclerView.findViewHolderForAdapterPosition(position)
+            viewHolder?.let {
+//                animateViewWidth(it.itemView)
+            }
+        })
 
         // 设置适配器
         recyclerView.adapter = adapter

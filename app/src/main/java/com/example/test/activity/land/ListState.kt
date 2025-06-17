@@ -14,8 +14,10 @@ interface ListState {
         // 列表完全态
         const val ListCompletely = 2
         // 列表退场进入切歌态 - 前期滑动列表
-        const val ListTransToSwitchScrollToTarget = 3
+        const val ListTransToSwitchSmoothScrollToTarget = 3
+        // 列表退场进入切歌态 - 列表不点击其他歌曲，不需要滑动列表，直接原地退场到切歌态
+        const val ListTransToSwitchScrollToTarget = 4
         // 列表退场进入切歌态 - 后期列表渐隐彻底蜕变为切歌态
-        const val ListTransToSwitchFadeExit = 4
+        const val ListTransToSwitchFadeExit = 5
     }
 }

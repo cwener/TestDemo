@@ -4,7 +4,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.graphics.toColorInt
 import androidx.core.view.marginLeft
 import androidx.core.view.updateLayoutParams
@@ -20,7 +19,7 @@ import com.example.test.utils.setMarginRight
 import kotlin.math.abs
 
 
-class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val onItemClick: (MusicInfo, Int) -> Unit) : RecyclerView.Adapter<MusicAdapter2.MusicViewHolder>() {
+class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val onCircleInItemClick: (MusicInfo, Int) -> Unit, private val onItemCircleOutClick: (MusicInfo, Int) -> Unit) : RecyclerView.Adapter<MusicAdapter2.MusicViewHolder>() {
 
     companion object {
         val BASIC_RIGHT_SPACE = DimensionUtils.getFullScreenWidth() - DimensionUtils.dpToPx(400f)
@@ -47,10 +46,6 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
     var smoothDirection = NONE_DIRECTION
     var toLeftOriginLeft = -1
 
-    val adapterItemClick : (MusicInfo, Int) -> Unit = { music, pos ->
-        onItemClick.invoke(music, pos)
-    }
-
     var interactiveStatus = ListState.SwitchMusic
 
     init {
@@ -71,7 +66,7 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                Log.d("MusicAdapt", "onScrolled, dx=$dx, smoothDirection=$smoothDirection")
+                Log.d("MusicAdapt", "onScrolled, dx=$dx, smoothDirection=$smoothDirection, currentPosition=$currentPosition")
                 // smoothDirection 大于 0 时才是真正的改变了目标位置
                 if (interactiveStatus == ListState.SwitchMusic) {
                     when(smoothDirection) {
@@ -147,7 +142,7 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_music, parent, false)
         val binding = ItemMusicBinding.bind(view)
-        return MusicViewHolder(binding, adapterItemClick)
+        return MusicViewHolder(binding, onCircleInItemClick, onItemCircleOutClick)
     }
 
 
@@ -313,7 +308,7 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                     }
                 }
             }
-            ListState.ListTransToSwitchScrollToTarget -> {
+            ListState.ListTransToSwitchSmoothScrollToTarget -> {
                 if (binding.root.width != BASIC_ITEM_WIDTH) {
                     binding.root.layoutParams.width = BASIC_ITEM_WIDTH
                 }
@@ -339,7 +334,8 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
 
     inner class MusicViewHolder(
         val binding: ItemMusicBinding,
-        private val onItemClick: (MusicInfo, Int) -> Unit
+        private val onCircleInItemClick: (MusicInfo, Int) -> Unit,
+        onItemCircleOutClick: (MusicInfo, Int) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         val colorMap = mutableMapOf<String, String>()
 
@@ -358,13 +354,13 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
             binding.clickDelegateSpace.setBackgroundColor(colorMap[music.id]?.toColorInt() ?: "#66605A7C".toColorInt())
             binding.name.text = (music.id.toInt() - 1).toString()
             binding.clickDelegateSpace.onCircleInClickListener = {
-                onItemClick.invoke(music, position)
+                onCircleInItemClick.invoke(music, position)
             }
             binding.clickDelegateSpace.onCircleInLongClickListener = {
-                onItemClick.invoke(music, position)
+                onCircleInItemClick.invoke(music, position)
             }
             binding.clickDelegateSpace.onCircleOutClickListener = {
-                Toast.makeText(binding.root.context, "onCircleOutClickListener", Toast.LENGTH_SHORT).show()
+                onItemCircleOutClick.invoke(music, position)
             }
         }
     }

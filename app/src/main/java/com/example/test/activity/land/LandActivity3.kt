@@ -9,14 +9,20 @@ import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.BounceInterpolator
+import android.view.animation.Interpolator
 import android.widget.Toast
+import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.test.R
 import com.example.test.activity.ApplicationWrapper
 import com.example.test.activity.land.MusicAdapter2.Companion.BASIC_LEFT_SPACE
 import com.example.test.databinding.ActivityLandBinding
 import com.example.test.utils.smoothScrollToPositionWithOffset
+import kotlin.math.pow
+import kotlin.math.sin
 
 
 /**
@@ -24,38 +30,47 @@ import com.example.test.utils.smoothScrollToPositionWithOffset
  * @date：2025/6/1 19:13
  * @desc：
  */
-class LandActivity3: FragmentActivity() {
+class LandActivity3 : FragmentActivity() {
 
     private lateinit var adapter: MusicAdapter2
     private lateinit var recyclerView: TouchInterceptorRecyclerView
     private val pageSnapHelper = CustomPagerSnapHelper2()
     private val leftOffsetSnapHelper = LeftOffsetSnapHelper(BASIC_LEFT_SPACE)
     private val handler = Handler(Looper.getMainLooper())
+    private var binding: ActivityLandBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityLandBinding.inflate(LayoutInflater.from(this))
-        setContentView(binding.root)
-        binding.imageDown.setOnClickListener {
+        val local = ActivityLandBinding.inflate(LayoutInflater.from(this))
+        binding = local
+        setContentView(local.root)
+        local.imageDown.setOnClickListener {
             Toast.makeText(this, "下层View响应点击", Toast.LENGTH_SHORT).show()
         }
         recyclerView = findViewById<TouchInterceptorRecyclerView>(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        recyclerView.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         // 初始化适配器
-        adapter = MusicAdapter2(recyclerView) { music, position ->
+        adapter = MusicAdapter2(recyclerView, onCircleInItemClick = { music, position ->
             // 处理item点击事件
-            Toast.makeText(ApplicationWrapper.instance, "Selected: ${music.title}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                ApplicationWrapper.instance,
+                "Selected: ${music.title}",
+                Toast.LENGTH_SHORT
+            ).show()
             adapter.currentPosition = position
             if (adapter.interactiveStatus == ListState.SwitchMusic) {
                 if (position == adapter.currentPosition) {
                     transStatus(ListState.TransToList, position)
                 }
             } else if (adapter.interactiveStatus == ListState.ListCompletely) {
-                transStatus(ListState.ListTransToSwitchScrollToTarget, position)
+                transStatus(ListState.ListTransToSwitchSmoothScrollToTarget, position)
             }
 
-        }
+        }, onItemCircleOutClick = { music, position ->
+            transStatus(ListState.ListTransToSwitchScrollToTarget, adapter.currentPosition)
+        })
 
         // 设置适配器
         recyclerView.adapter = adapter
@@ -76,11 +91,13 @@ class LandActivity3: FragmentActivity() {
 
         pageSnapHelper.attachToRecyclerView(null)
         leftOffsetSnapHelper.attachToRecyclerView(null)
-
-        when(status) {
+        binding?.root?.setOnClickListener(null)
+        binding?.root?.isClickable = false
+        when (status) {
             ListState.SwitchMusic -> {
                 pageSnapHelper.attachToRecyclerView(recyclerView)
             }
+
             ListState.TransToList -> {
                 pageSnapHelper.attachToRecyclerView(null)
                 val animator = ValueAnimator.ofFloat(1f, 0f).apply {
@@ -89,7 +106,7 @@ class LandActivity3: FragmentActivity() {
                         adapter.renderTransToList(currentWidth)
                     }
                     duration = 500
-                    interpolator = AccelerateDecelerateInterpolator()
+                    interpolator = BounceInterpolator()
                     addListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
                             transStatus(ListState.ListCompletely, clickPos)
@@ -99,21 +116,38 @@ class LandActivity3: FragmentActivity() {
 
                 animator.start()
             }
+
             ListState.ListCompletely -> {
                 leftOffsetSnapHelper.attachToRecyclerView(recyclerView)
+                binding?.root?.setOnClickListener {
+                    transStatus(ListState.ListTransToSwitchScrollToTarget, adapter.currentPosition)
+                }
             }
-            ListState.ListTransToSwitchScrollToTarget -> {
+
+            ListState.ListTransToSwitchSmoothScrollToTarget -> {
                 Log.d(MusicAdapter2.TAG, "smoothScrollToPositionWithOffset started")
-                recyclerView.smoothScrollToPositionWithOffset(clickPos, BASIC_LEFT_SPACE, onScrolled = {
-                    for (i in 0 until recyclerView.childCount) {
-                        val child = recyclerView.getChildAt(i)
-                        adapter.setScaleAndAlpha(child)
-                    }
-                }, onScrollFinished = {
-                    Log.d(MusicAdapter2.TAG, "smoothScrollToPositionWithOffset finished")
-                    transStatus(ListState.ListTransToSwitchFadeExit, adapter.currentPosition)
-                })
+                recyclerView.smoothScrollToPositionWithOffset(
+                    clickPos,
+                    BASIC_LEFT_SPACE,
+                    onScrolled = {
+                        for (i in 0 until recyclerView.childCount) {
+                            val child = recyclerView.getChildAt(i)
+                            adapter.setScaleAndAlpha(child)
+                        }
+                    },
+                    onScrollFinished = {
+                        Log.d(MusicAdapter2.TAG, "smoothScrollToPositionWithOffset finished")
+                        transStatus(ListState.ListTransToSwitchFadeExit, adapter.currentPosition)
+                    })
             }
+
+            ListState.ListTransToSwitchScrollToTarget -> {
+                binding?.let { binding ->
+                    binding.recyclerView.scrollToPosition(adapter.currentPosition)
+                    transStatus(ListState.ListTransToSwitchFadeExit, adapter.currentPosition)
+                }
+            }
+
             ListState.ListTransToSwitchFadeExit -> {
                 adapter.renderTransToSwitch(onScrollFinished = {
                     handler.postDelayed(object : Runnable {
