@@ -15,7 +15,6 @@ import com.example.test.databinding.ItemMusicBinding
 import com.example.test.utils.DimensionUtils
 import com.example.test.utils.generateRandomHexColor
 import com.example.test.utils.setMarginLeft
-import com.example.test.utils.setMarginRight
 import kotlin.math.abs
 
 
@@ -169,7 +168,7 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
             vh ?: continue
             val position = recyclerView.getChildAdapterPosition(child)
             if (position == currentPosition) {
-                val width = (DimensionUtils.getFullScreenWidth() * animatedValue).toInt()
+                var width = (DimensionUtils.getFullScreenWidth() * animatedValue).toInt()
                 if (position == 0) {
                     if (width < BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE) {
                         vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE
@@ -178,24 +177,33 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                     }
                     vh.binding.imgCover.setMarginLeft(BASIC_LEFT_SPACE)
                 } else {
-                    if (width < BASIC_ITEM_WIDTH) {
-                        vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH
-                    } else {
-                        vh.binding.root.layoutParams.width = width
-                    }
+                    // 目标位置宽度变化时，会自动向左靠，因此需要不断计算左靠的距离，并抵消它
                     val leftMargin = (BASIC_LEFT_SPACE * animatedValue).toInt()
-                    vh.binding.imgCover.setMarginLeft(if (leftMargin < BASIC_SPACE) BASIC_SPACE else leftMargin)
-                    vh.binding.imgCover.setMarginRight(BASIC_SPACE)
+                    vh.binding.imgCover.setMarginLeft(leftMargin)
                     val scrollDistance = BASIC_LEFT_SPACE - leftMargin
                     (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, scrollDistance)
-                    Log.d(TAG, "scrollDistance=${scrollDistance}")
+
+                    if (width < BASIC_ITEM_WIDTH) {
+                        width = BASIC_ITEM_WIDTH
+                    }
+                    vh.binding.root.updateLayoutParams { this.width = width + leftMargin * 2 }
+                    Log.d(TAG, "scrollDistance=${scrollDistance}, newWidth=${width}, rootWidth=${vh.binding.root.width}")
                 }
             } else {
-                if (vh.binding.root.width != BASIC_ITEM_WIDTH) {
-                    vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH
-                }
-                if (vh.binding.imgCover.marginLeft != BASIC_SPACE) {
-                    vh.binding.imgCover.setMarginLeft(BASIC_SPACE)
+                if (position != 0) {
+                    if (vh.binding.root.width != BASIC_ITEM_WIDTH) {
+                        vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH
+                    }
+                    if (vh.binding.imgCover.marginLeft != 0) {
+                        vh.binding.imgCover.setMarginLeft(0)
+                    }
+                } else {
+                    if (vh.binding.root.width != (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE)) {
+                        vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE
+                    }
+                    if (vh.binding.imgCover.marginLeft != BASIC_LEFT_SPACE) {
+                        vh.binding.imgCover.setMarginLeft(BASIC_LEFT_SPACE)
+                    }
                 }
             }
             // 遍历所有可见的ViewHolder

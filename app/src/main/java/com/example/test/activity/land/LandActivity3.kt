@@ -8,21 +8,13 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.BounceInterpolator
-import android.view.animation.Interpolator
 import android.widget.Toast
-import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.test.R
-import com.example.test.activity.ApplicationWrapper
 import com.example.test.activity.land.MusicAdapter2.Companion.BASIC_LEFT_SPACE
 import com.example.test.databinding.ActivityLandBinding
 import com.example.test.utils.smoothScrollToPositionWithOffset
-import kotlin.math.pow
-import kotlin.math.sin
 
 
 /**
@@ -54,11 +46,11 @@ class LandActivity3 : FragmentActivity() {
         // 初始化适配器
         adapter = MusicAdapter2(recyclerView, onCircleInItemClick = { music, position ->
             // 处理item点击事件
-            Toast.makeText(
-                ApplicationWrapper.instance,
-                "Selected: ${music.title}",
-                Toast.LENGTH_SHORT
-            ).show()
+//            Toast.makeText(
+//                ApplicationWrapper.instance,
+//                "Selected: ${music.title}",
+//                Toast.LENGTH_SHORT
+//            ).show()
             adapter.currentPosition = position
             if (adapter.interactiveStatus == ListState.SwitchMusic) {
                 if (position == adapter.currentPosition) {
@@ -105,8 +97,8 @@ class LandActivity3 : FragmentActivity() {
                         val currentWidth = animator.animatedValue as Float
                         adapter.renderTransToList(currentWidth)
                     }
-                    duration = 500
-                    interpolator = BounceInterpolator()
+                    duration = 600
+                    interpolator = EaseCubicInterpolator3(0.33f, 0.52f, 0.64f, 1f)
                     addListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
                             transStatus(ListState.ListCompletely, clickPos)
