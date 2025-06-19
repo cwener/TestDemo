@@ -1,8 +1,5 @@
 package com.example.test.activity.land
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.ValueAnimator
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -14,7 +11,6 @@ import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
 import com.example.test.R
 import com.example.test.activity.land.MusicAdapter2.Companion.BASIC_ITEM_WIDTH
 import com.example.test.activity.land.MusicAdapter2.Companion.BASIC_LEFT_SPACE
@@ -183,93 +179,10 @@ class LandActivity3 : FragmentActivity() {
 
     private fun loadMusicData() {
         // 模拟从网络或数据库加载数据
-        val musicList = listOf(
-            MusicInfo(
-                id = "1",
-                coverUrl = "http://p1.music.126.net/xXuvLXSk1RcD1Dx5JInIiw==/109951169612265280.jpg",
-                title = "Shape of You",
-                artist = "Ed Sheeran"
-            ),
-            MusicInfo(
-                id = "2",
-                coverUrl = "http://p1.music.126.net/73Acuw1l7Wc7Q98-FkIwBw==/109951168224246420.jpg",
-                title = "Blinding Lights",
-                artist = "The Weeknd"
-            ),
-            MusicInfo(
-                id = "3",
-                coverUrl = "http://p1.music.126.net/pHD15yOuVKvRy0xmlNaKww==/109951167386107088.jpg",
-                title = "Dance Monkey",
-                artist = "Tones and I"
-            ),
-            MusicInfo(
-                id = "4",
-                coverUrl = "http://p2.music.126.net/5k_BRr3vUfjJq97LQaj3jQ==/109951166583357991.jpg",
-                title = "Someone You Loved",
-                artist = "Lewis Capaldi"
-            ),
-            MusicInfo(
-                id = "5",
-                coverUrl = "http://p2.music.126.net/iN7OUPkcavI2MBSG8pf2jw==/109951170600632372.jpg",
-                title = "Bad Guy",
-                artist = "Billie Eilish"
-            ),
-            MusicInfo(
-                id = "6",
-                coverUrl = "http://p2.music.126.net/oiXnXrU6XJ9cIQe_3ii2YQ==/5923069139090882.jpg",
-                title = "Bad Guy",
-                artist = "Billie Eilish"
-            ),
-            MusicInfo(
-                id = "7",
-                coverUrl = "http://p2.music.126.net/wcLyz1Cf111MWz9Odg0iRw==/109951164975030169.jpg",
-                title = "Bad Guy",
-                artist = "Billie Eilish"
-            ),
-            MusicInfo(
-                id = "8",
-                coverUrl = "http://p1.music.126.net/xXuvLXSk1RcD1Dx5JInIiw==/109951169612265280.jpg",
-                title = "Shape of You",
-                artist = "Ed Sheeran"
-            ),
-            MusicInfo(
-                id = "9",
-                coverUrl = "http://p1.music.126.net/73Acuw1l7Wc7Q98-FkIwBw==/109951168224246420.jpg",
-                title = "Blinding Lights",
-                artist = "The Weeknd"
-            ),
-            MusicInfo(
-                id = "10",
-                coverUrl = "http://p1.music.126.net/pHD15yOuVKvRy0xmlNaKww==/109951167386107088.jpg",
-                title = "Dance Monkey",
-                artist = "Tones and I"
-            ),
-            MusicInfo(
-                id = "11",
-                coverUrl = "http://p2.music.126.net/5k_BRr3vUfjJq97LQaj3jQ==/109951166583357991.jpg",
-                title = "Someone You Loved",
-                artist = "Lewis Capaldi"
-            ),
-            MusicInfo(
-                id = "12",
-                coverUrl = "http://p2.music.126.net/iN7OUPkcavI2MBSG8pf2jw==/109951170600632372.jpg",
-                title = "Bad Guy",
-                artist = "Billie Eilish"
-            ),
-            MusicInfo(
-                id = "13",
-                coverUrl = "http://p2.music.126.net/oiXnXrU6XJ9cIQe_3ii2YQ==/5923069139090882.jpg",
-                title = "Bad Guy",
-                artist = "Billie Eilish"
-            ),
-            MusicInfo(
-                id = "14",
-                coverUrl = "http://p2.music.126.net/wcLyz1Cf111MWz9Odg0iRw==/109951164975030169.jpg",
-                title = "Bad Guy",
-                artist = "Billie Eilish"
-            )
-        )
-
+        val musicList = mutableListOf<MusicInfo>()
+        for (i in 1 until 100) {
+            musicList.add(MusicInfo(id = "$i", title = "Music $i", artist = "Artist $i", coverUrl = "http://p1.music.126.net/xXuvLXSk1RcD1Dx5JInIiw==/109951169612265280.jpg"))
+        }
         // 提交到适配器
         adapter.setList(musicList)
     }
