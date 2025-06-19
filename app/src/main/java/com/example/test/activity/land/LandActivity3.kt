@@ -9,11 +9,17 @@ import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Toast
+import androidx.dynamicanimation.animation.FloatValueHolder
+import androidx.dynamicanimation.animation.SpringAnimation
+import androidx.dynamicanimation.animation.SpringForce
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.example.test.R
+import com.example.test.activity.land.MusicAdapter2.Companion.BASIC_ITEM_WIDTH
 import com.example.test.activity.land.MusicAdapter2.Companion.BASIC_LEFT_SPACE
 import com.example.test.databinding.ActivityLandBinding
+import com.example.test.utils.DimensionUtils
 import com.example.test.utils.smoothScrollToPositionWithOffset
 
 
@@ -92,21 +98,41 @@ class LandActivity3 : FragmentActivity() {
 
             ListState.TransToList -> {
                 pageSnapHelper.attachToRecyclerView(null)
-                val animator = ValueAnimator.ofFloat(1f, 0f).apply {
-                    addUpdateListener { animator ->
-                        val currentWidth = animator.animatedValue as Float
-                        adapter.renderTransToList(currentWidth)
-                    }
-                    duration = 600
-                    interpolator = EaseCubicInterpolator3(0.33f, 0.52f, 0.64f, 1f)
-                    addListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            transStatus(ListState.ListCompletely, clickPos)
-                        }
-                    })
+
+                // 创建一个FloatValueHolder来保存当前值
+                val valueHolder = FloatValueHolder(DimensionUtils.getFullScreenWidth().toFloat())
+
+                // 创建SpringAnimation动画
+                val springAnimation = SpringAnimation(valueHolder)
+
+                // 配置SpringForce
+                val springForce = SpringForce(BASIC_ITEM_WIDTH.toFloat()).apply {
+                    // 设置阻尼比 - 控制振荡
+                    dampingRatio = 0.783f
+
+                    // 设置刚度 - 控制速度
+                    stiffness = 132f
                 }
 
-                animator.start()
+                // 为动画设置SpringForce
+                springAnimation.spring = springForce
+
+                // 监听动画更新
+                springAnimation.addUpdateListener { _, value, _ ->
+                    // 更新UI显示当前值
+                    val roundedValue = value.toInt()
+                    Log.d("SpringAnimation", "Current value: $value")
+                    adapter.renderTransToList(roundedValue)
+                }
+
+                // 动画结束监听
+                springAnimation.addEndListener { _, _, _, _ ->
+                    Log.d("SpringAnimation", "Animation ended")
+                    transStatus(ListState.ListCompletely, clickPos)
+                }
+
+                // 启动动画
+                springAnimation.start()
             }
 
             ListState.ListCompletely -> {

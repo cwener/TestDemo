@@ -40,6 +40,12 @@ class TouchInterceptorRecyclerView @JvmOverloads constructor(
         return if (interceptedByHandle) super.onTouchEvent(e) else false
     }
 
+    override fun fling(velocityX: Int, velocityY: Int): Boolean {
+        // 修改滑动速度
+        val tmp = velocityX * 0.5f
+        return super.fling(tmp.toInt(), velocityY);
+    }
+
     private fun isTouchOnHandle(x: Float, y: Float): Boolean {
         val childView = findChildViewUnder(x, y) ?: return false
         val handleView = childView.findViewById<View>(handleImageViewId) ?: return false

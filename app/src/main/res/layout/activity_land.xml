@@ -12,14 +12,20 @@
         android:layout_height="match_parent"
         android:background="@color/material_dynamic_primary30"
         tools:context=".activity.land.LandActivity">
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/imageDown"
-            app:layout_constraintTop_toTopOf="parent"
+
+        <FrameLayout
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginEnd="200dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="200dp"
-            android:layout_width="50dp"
-            android:layout_height="50dp"/>
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imageDown"
+                android:layout_width="150dp"
+                android:layout_height="150dp" />
+        </FrameLayout>
 
         <com.example.test.activity.land.TouchInterceptorRecyclerView
             android:id="@+id/recyclerView"

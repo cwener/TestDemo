@@ -161,14 +161,14 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
         notifyDataSetChanged()
     }
 
-    fun renderTransToList(animatedValue: Float) {
+    fun renderTransToList(animatedWidth: Int) {
         for (i in 0 until recyclerView.childCount) {
             val child = recyclerView.getChildAt(i)
             val vh = recyclerView.findContainingViewHolder(child) as? MusicViewHolder
             vh ?: continue
             val position = recyclerView.getChildAdapterPosition(child)
             if (position == currentPosition) {
-                var width = (DimensionUtils.getFullScreenWidth() * animatedValue).toInt()
+                var width = animatedWidth
                 if (position == 0) {
                     if (width < BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE) {
                         vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE
@@ -178,16 +178,16 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                     vh.binding.imgCover.setMarginLeft(BASIC_LEFT_SPACE)
                 } else {
                     // 目标位置宽度变化时，会自动向左靠，因此需要不断计算左靠的距离，并抵消它
-                    val leftMargin = (BASIC_LEFT_SPACE * animatedValue).toInt()
+                    val ratio = (animatedWidth - BASIC_ITEM_WIDTH) / (DimensionUtils.getFullScreenWidth() - BASIC_ITEM_WIDTH).toFloat()
+                    val leftMargin = (BASIC_LEFT_SPACE * ratio).toInt()
+                    Log.d("SpringAnimation", "ratio: $ratio")
                     vh.binding.imgCover.setMarginLeft(leftMargin)
                     val scrollDistance = BASIC_LEFT_SPACE - leftMargin
                     (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, scrollDistance)
 
-                    if (width < BASIC_ITEM_WIDTH) {
-                        width = BASIC_ITEM_WIDTH
-                    }
-                    vh.binding.root.updateLayoutParams { this.width = width + leftMargin * 2 }
-                    Log.d(TAG, "scrollDistance=${scrollDistance}, newWidth=${width}, rootWidth=${vh.binding.root.width}")
+
+                    vh.binding.root.updateLayoutParams { this.width = width  }
+                    Log.d(TAG, "scrollDistance=${scrollDistance}, newWidth=${width}, rootWidth=${vh.binding.root.width}，leftMargin=$leftMargin")
                 }
             } else {
                 if (position != 0) {
@@ -359,7 +359,7 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
             if (!colorMap.contains(music.id)) {
                 colorMap.put(music.id, generateRandomHexColor(music.id.toLong()))
             }
-            binding.clickDelegateSpace.setBackgroundColor(colorMap[music.id]?.toColorInt() ?: "#66605A7C".toColorInt())
+            binding.root.setBackgroundColor(colorMap[music.id]?.toColorInt() ?: "#66605A7C".toColorInt())
             binding.name.text = (music.id.toInt() - 1).toString()
             binding.clickDelegateSpace.onCircleInClickListener = {
                 onCircleInItemClick.invoke(music, position)
