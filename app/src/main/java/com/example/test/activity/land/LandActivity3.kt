@@ -10,7 +10,6 @@ import androidx.dynamicanimation.animation.FloatValueHolder
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
 import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.test.R
 import com.example.test.activity.land.MusicAdapter2.Companion.BASIC_ITEM_WIDTH
 import com.example.test.activity.land.MusicAdapter2.Companion.BASIC_LEFT_SPACE
@@ -29,7 +28,9 @@ class LandActivity3 : FragmentActivity() {
     private lateinit var adapter: MusicAdapter2
     private lateinit var recyclerView: TouchInterceptorRecyclerView
     private val pageSnapHelper = CustomPagerSnapHelper2()
-    private val leftOffsetSnapHelper = LeftOffsetSnapHelper(BASIC_LEFT_SPACE)
+    private val leftOffsetLayoutManager by lazy {
+        DynamicAttachLayoutManager(context = this, BASIC_LEFT_SPACE)
+    }
     private val handler = Handler(Looper.getMainLooper())
     private var binding: ActivityLandBinding? = null
 
@@ -42,8 +43,8 @@ class LandActivity3 : FragmentActivity() {
             Toast.makeText(this, "下层View响应点击", Toast.LENGTH_SHORT).show()
         }
         recyclerView = findViewById<TouchInterceptorRecyclerView>(R.id.recyclerView)
-        recyclerView.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        recyclerView.layoutManager = leftOffsetLayoutManager
+
 
         // 初始化适配器
         adapter = MusicAdapter2(recyclerView, onCircleInItemClick = { music, position ->
@@ -84,9 +85,9 @@ class LandActivity3 : FragmentActivity() {
         adapter.interactiveStatus = status
 
         pageSnapHelper.attachToRecyclerView(null)
-        leftOffsetSnapHelper.attachToRecyclerView(null)
         binding?.root?.setOnClickListener(null)
         binding?.root?.isClickable = false
+        leftOffsetLayoutManager.setAttachEnabled(false)
         when (status) {
             ListState.SwitchMusic -> {
                 pageSnapHelper.attachToRecyclerView(recyclerView)
@@ -132,7 +133,7 @@ class LandActivity3 : FragmentActivity() {
             }
 
             ListState.ListCompletely -> {
-                leftOffsetSnapHelper.attachToRecyclerView(recyclerView)
+                leftOffsetLayoutManager.setAttachEnabled(true)
                 binding?.root?.setOnClickListener {
                     transStatus(ListState.ListTransToSwitchScrollToTarget, adapter.currentPosition)
                 }
