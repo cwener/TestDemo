@@ -13,25 +13,26 @@ import kotlin.math.ln
 
 class NaturalSnapHelper(
     private val leftOffsetPx: Int = 0,
-    private val maxFlingItems: Int = 10,
-    val context: Context
+    private val maxFlingItems: Int = 5,
+    context: Context
 ) : SnapHelper() {
 
     private var recyclerView: RecyclerView? = null
-    private val decelerateInterpolator = DecelerateInterpolator(3f)
-    private val minFlingVelocity = 200 // 最小触发滑动的速度(dp/s)
+    private val decelerateInterpolator = DecelerateInterpolator(1.8f)  // 优化减速曲线
+    private val minFlingVelocity: Int = dpToPx(context, 100)          // 合理的最小触发速度
+    private val maxVelocity = 20000f                                  // 安全的速度上限
     private var scroller: SnapScroller? = null
-    private val maxVelocity = 40000f
 
     override fun attachToRecyclerView(recyclerView: RecyclerView?) {
         super.attachToRecyclerView(recyclerView)
-        this.recyclerView = recyclerView
-        scroller = SnapScroller(context)
+        this.recyclerView = recyclerView?.apply {
+            scroller = SnapScroller(context)
+        }
     }
 
     private inner class SnapScroller(context: Context?) : LinearSmoothScroller(context) {
         override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
-            return 50f / displayMetrics.densityDpi
+            return 35f / displayMetrics.densityDpi  // 优化滚动速度
         }
 
         override fun calculateDtToFit(
@@ -68,16 +69,15 @@ class NaturalSnapHelper(
         layoutManager: RecyclerView.LayoutManager,
         targetView: View
     ): IntArray {
-        val out = IntArray(2)
-        if (layoutManager.canScrollHorizontally()) {
-            out[0] = targetView.left - leftOffsetPx
+        return IntArray(2).apply {
+            if (layoutManager.canScrollHorizontally()) {
+                this[0] = targetView.left - leftOffsetPx
+            }
         }
-        return out
     }
 
     override fun findSnapView(layoutManager: RecyclerView.LayoutManager?): View? {
-        if (layoutManager !is LinearLayoutManager ||
-            !layoutManager.canScrollHorizontally()) {
+        if (layoutManager !is LinearLayoutManager || !layoutManager.canScrollHorizontally()) {
             return null
         }
         return findClosestViewToLeftOffset(layoutManager)
@@ -85,22 +85,11 @@ class NaturalSnapHelper(
 
     private fun findClosestViewToLeftOffset(layoutManager: LinearLayoutManager): View? {
         val firstVisible = layoutManager.findFirstVisibleItemPosition()
-        val lastVisible = layoutManager.findLastVisibleItemPosition()
-
         if (firstVisible == RecyclerView.NO_POSITION) return null
 
-        var closestView: View? = null
-        var minDistance = Int.MAX_VALUE
-
-        for (i in firstVisible..lastVisible) {
-            val view = layoutManager.findViewByPosition(i) ?: continue
-            val distance = abs(view.left - leftOffsetPx)
-            if (distance < minDistance) {
-                minDistance = distance
-                closestView = view
-            }
-        }
-        return closestView
+        return (firstVisible..layoutManager.findLastVisibleItemPosition())
+            .mapNotNull { layoutManager.findViewByPosition(it) }
+            .minByOrNull { abs(it.left - leftOffsetPx) }
     }
 
     override fun findTargetSnapPosition(
@@ -108,32 +97,33 @@ class NaturalSnapHelper(
         velocityX: Int,
         velocityY: Int
     ): Int {
-        if (layoutManager !is LinearLayoutManager ||
-            !layoutManager.canScrollHorizontally()) {
+        if (layoutManager !is LinearLayoutManager || !layoutManager.canScrollHorizontally()) {
             return RecyclerView.NO_POSITION
         }
 
         val itemCount = layoutManager.itemCount
         if (itemCount == 0) return RecyclerView.NO_POSITION
 
-        if (abs(velocityX) < minFlingVelocity) {
+        // 优化速度检测逻辑
+        val absVelocity = abs(velocityX)
+        if (absVelocity < minFlingVelocity) {
             return RecyclerView.NO_POSITION
         }
 
         val closestView = findSnapView(layoutManager) ?: return RecyclerView.NO_POSITION
         val currentPosition = layoutManager.getPosition(closestView)
 
-        val absVelocity = abs(velocityX).toFloat()
-        val maxVelocity = maxVelocity
-        val normalizedVelocity = (absVelocity / maxVelocity).coerceIn(0f, 1f)
+        // 优化速度映射计算
+        val normalizedVelocity = (absVelocity.coerceAtMost(maxVelocity.toInt()) / maxVelocity)
+            .coerceIn(0f, 1f)
         val interpolated = decelerateInterpolator.getInterpolation(normalizedVelocity)
-        val logScaled = ln(interpolated * 9 + 1) / ln(10f)
-        val scrollDistance = (logScaled * maxFlingItems).toInt() *
+        val scrollDistance = (ln(interpolated * 9 + 1) / ln(10f) * maxFlingItems).toInt() *
                 if (velocityX > 0) 1 else -1
 
-        var targetPosition = currentPosition + scrollDistance
-        targetPosition = targetPosition.coerceIn(0, itemCount - 1)
+        val targetPosition = (currentPosition + scrollDistance)
+            .coerceIn(0, itemCount - 1)
 
+        // 使用平滑滚动
         scroller?.targetPosition = targetPosition
         layoutManager.startSmoothScroll(scroller)
 
