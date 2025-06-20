@@ -8,15 +8,19 @@ import kotlin.math.abs
 
 class DynamicAttachLayoutManager(
     context: Context,
-    private val attachDistancePx: Int = 100
+    private val attachDistancePx: Int = 100,
+    val recyclerView: RecyclerView,
 ) : LinearLayoutManager(context, HORIZONTAL, false) {
 
     private var isAttachEnabled = false
     private val targetOffset = attachDistancePx
     private var recyclerViewRef: RecyclerView? = null
+    private val stiffness = 154f
+    private val dampingRatio = 0.93f
 
     // 平滑滚动器缓存
     private val attachScroller by lazy { HorizontalSpringScroller(context, attachDistancePx) }
+//    private val attachScroller by lazy { SpringSmoothScroller(context, recyclerView, stiffness, dampingRatio, targetOffset) }
 
     /**
      * 动态设置是否启用吸附功能

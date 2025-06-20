@@ -29,7 +29,7 @@ class LandActivity3 : FragmentActivity() {
     private lateinit var recyclerView: TouchInterceptorRecyclerView
     private val pageSnapHelper = CustomPagerSnapHelper2()
     private val leftOffsetLayoutManager by lazy {
-        DynamicAttachLayoutManager(context = this, BASIC_LEFT_SPACE)
+        DynamicAttachLayoutManager(context = this, BASIC_LEFT_SPACE, binding!!.recyclerView)
     }
     private val handler = Handler(Looper.getMainLooper())
     private var binding: ActivityLandBinding? = null
