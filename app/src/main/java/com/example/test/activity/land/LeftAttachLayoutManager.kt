@@ -1,10 +1,8 @@
 package com.example.test.activity.land
 
 import android.content.Context
-import android.util.DisplayMetrics
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.abs
 
@@ -18,7 +16,7 @@ class DynamicAttachLayoutManager(
     private var recyclerViewRef: RecyclerView? = null
 
     // 平滑滚动器缓存
-    private val attachScroller by lazy { AttachSmoothScroller(context) }
+    private val attachScroller by lazy { HorizontalSpringScroller(context, attachDistancePx) }
 
     /**
      * 动态设置是否启用吸附功能
@@ -100,17 +98,5 @@ class DynamicAttachLayoutManager(
         } else {
             super.smoothScrollToPosition(recyclerView, state, position)
         }
-    }
-
-    private inner class AttachSmoothScroller(context: Context) : LinearSmoothScroller(context) {
-        override fun calculateDtToFit(
-            viewStart: Int, viewEnd: Int, boxStart: Int, boxEnd: Int, snapPreference: Int
-        ): Int = targetOffset - viewStart
-
-        override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
-            return 100f / displayMetrics.densityDpi
-        }
-
-        override fun getHorizontalSnapPreference(): Int = SNAP_TO_ANY
     }
 }
