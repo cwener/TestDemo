@@ -32,7 +32,7 @@ import kotlin.random.Random
 fun RecyclerView.smoothScrollToPositionWithOffset(position: Int, offset: Int = 100, orientation: Int = RecyclerView.HORIZONTAL, onScrolled: ((dx: Int) -> Unit)? = null, onScrollFinished: (() -> Unit)? = null) {
     val vh = findViewHolderForAdapterPosition(position)
     vh ?: return
-    if ((orientation == RecyclerView.HORIZONTAL && vh.itemView.left == offset) || (orientation == RecyclerView.VERTICAL && vh.itemView.top == offset)) {
+    if ((orientation == RecyclerView.HORIZONTAL && vh.itemView.left == offset) || (orientation == RecyclerView.VERTICAL && vh.itemView.top == offset) || !canScrollHorizontally(-1)) {
         // 当前已经在目标位置和距离
         onScrollFinished?.invoke()
         return

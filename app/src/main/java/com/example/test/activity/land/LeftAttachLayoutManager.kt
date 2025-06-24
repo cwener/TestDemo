@@ -65,6 +65,9 @@ class DynamicAttachLayoutManager(
         val closestPosition = getPosition(closestChild)
         val closestLeft = getDecoratedLeft(closestChild)
         val offsetToTarget = targetOffset - closestLeft
+        if (abs(offsetToTarget) < 1 || !recyclerView.canScrollHorizontally(-1)) {
+            return
+        }
 
         if (abs(offsetToTarget) > 10) {
             recyclerView.smoothScrollToPosition(closestPosition)
