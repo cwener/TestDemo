@@ -337,6 +337,7 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                 (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, 0)
             }
         }
+        binding.clickDelegateSpace.circleInLongClickEnable = interactiveStatus == ListState.SwitchMusic
         Log.d(TAG, "fixWidthAndMargin, position=$position, curPosition=$curPosition, interactiveStatus=$interactiveStatus")
     }
 
@@ -370,6 +371,10 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
             binding.clickDelegateSpace.onCircleOutClickListener = {
                 onItemCircleOutClick.invoke(music, position)
             }
+        }
+
+        fun setCircleInLongClickEnable(enable: Boolean) {
+            binding.clickDelegateSpace.circleInLongClickEnable = enable
         }
     }
 }
