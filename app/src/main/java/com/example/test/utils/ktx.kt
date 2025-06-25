@@ -20,6 +20,7 @@ package com.example.test.utils
  * @param offset 目标位置距离左侧的偏移量(像素)
  */
 import android.graphics.PointF
+import android.graphics.Rect
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
@@ -117,4 +118,17 @@ fun generateRandomHexColor(seed: Long, previousColor: String? = null): String {
     }
 
     return newColor
+}
+
+/**
+ * 计算子View相对于RecyclerView左边缘的距离
+ *
+ * @param childView 需要计算位置的子View，可以是ItemView里的任意子View
+ * @return 子View左边缘相对于RecyclerView左边缘的距离（单位：像素）
+ */
+fun RecyclerView.getChildViewLeftRelativeToRecyclerView(childView: View): Int {
+    val offsetViewBounds = Rect()
+    childView.getDrawingRect(offsetViewBounds)
+    this.offsetDescendantRectToMyCoords(childView, offsetViewBounds)
+    return offsetViewBounds.left
 }
