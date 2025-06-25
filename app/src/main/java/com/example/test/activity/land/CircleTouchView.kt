@@ -31,8 +31,6 @@ class CircleTouchView @JvmOverloads constructor(
     var onCircleInClickListener: (() -> Unit)? = null
     var onCircleInLongClickListener: (() -> Unit)? = null
     var onCircleOutClickListener: (() -> Unit)? = null
-    var circleInLongClickEnable = true
-
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         centerX = width / 2f
@@ -49,7 +47,6 @@ class CircleTouchView @JvmOverloads constructor(
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val x = event.x
         val y = event.y
-
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 initialX = event.rawX
@@ -93,6 +90,7 @@ class CircleTouchView @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_CANCEL -> {
+                removeCallbacks(longPressRunnable)
                 return true
             }
         }
@@ -105,7 +103,7 @@ class CircleTouchView @JvmOverloads constructor(
     }
 
     private val longPressRunnable = Runnable {
-        if (isInCircle && !isClickConsumed && circleInLongClickEnable) {
+        if (isInCircle && !isClickConsumed) {
             isClickConsumed = true
             onCircleInLongClickListener?.invoke()
         }

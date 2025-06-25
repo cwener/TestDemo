@@ -2,7 +2,10 @@ package com.example.test.activity.land
 
 import android.content.Context
 import android.graphics.Rect
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
@@ -16,20 +19,60 @@ class TouchInterceptorRecyclerView @JvmOverloads constructor(
 
     private var handleImageViewId: Int = 0
     private var interceptedByHandle: Boolean = false
+    private var longTouchTriggered: Boolean = false
 
+    // 长按监听回调
+    var onLongTouchListener: (() -> Unit)? = null
     var onChildAttachedToWindow: ((View) -> Unit)? = null
+
+    // 长按阈值时间 - 500ms
+    private val LONG_TOUCH_THRESHOLD = 500L
+
+    private val longTouchHandler = Handler(Looper.getMainLooper())
+    private val longTouchRunnable = Runnable {
+        // 检查当前触摸的把手视图
+        currentTouchPoint?.let { point ->
+            longTouchTriggered = true
+            onLongTouchListener?.invoke()
+            Log.d("TouchInterceptorRecyclerView", "Long touch detected on handle view")
+        }
+    }
+
+    // 存储当前触摸点的位置
+    private var currentTouchPoint: Pair<Float, Float>? = null
 
     fun setHandleImageViewId(imageViewId: Int) {
         this.handleImageViewId = imageViewId
     }
 
-
     override fun onInterceptTouchEvent(e: MotionEvent): Boolean {
-        if (e.actionMasked == MotionEvent.ACTION_DOWN) {
-            interceptedByHandle = isTouchOnHandle(e.x, e.y)
+        when (e.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                interceptedByHandle = isTouchOnHandle(e.x, e.y)
 
-            if (!interceptedByHandle) {
-                return false
+                if (interceptedByHandle) {
+                    // 保存当前触摸点
+                    currentTouchPoint = Pair(e.x, e.y)
+
+                    // 设置长按检测
+                    longTouchTriggered = false
+                    longTouchHandler.postDelayed(longTouchRunnable, LONG_TOUCH_THRESHOLD)
+                }
+
+                if (!interceptedByHandle) {
+                    return false
+                }
+            }
+            MotionEvent.ACTION_MOVE -> {
+                // 移动过程中保持更新触摸点位置
+                if (interceptedByHandle) {
+                    currentTouchPoint = Pair(e.x, e.y)
+                }
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                // 移除长按检测
+                longTouchHandler.removeCallbacks(longTouchRunnable)
+                currentTouchPoint = null
             }
         }
 
@@ -37,6 +80,19 @@ class TouchInterceptorRecyclerView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(e: MotionEvent): Boolean {
+        when (e.actionMasked) {
+            MotionEvent.ACTION_MOVE -> {
+                if (interceptedByHandle) {
+                    currentTouchPoint = Pair(e.x, e.y)
+                }
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                // 移除长按检测
+                longTouchHandler.removeCallbacks(longTouchRunnable)
+                currentTouchPoint = null
+            }
+        }
+
         return if (interceptedByHandle) super.onTouchEvent(e) else false
     }
 
@@ -70,5 +126,11 @@ class TouchInterceptorRecyclerView @JvmOverloads constructor(
     override fun onChildAttachedToWindow(child: View) {
         super.onChildAttachedToWindow(child)
         onChildAttachedToWindow?.invoke(child)
+    }
+
+    // 当View被移除时确保清理Handler避免内存泄漏
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        longTouchHandler.removeCallbacks(longTouchRunnable)
     }
 }
