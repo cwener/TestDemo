@@ -1,20 +1,25 @@
 package com.example.test.activity.land
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.WindowManager
+import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
-import androidx.dynamicanimation.animation.FloatValueHolder
-import androidx.dynamicanimation.animation.SpringAnimation
-import androidx.dynamicanimation.animation.SpringForce
 import androidx.fragment.app.FragmentActivity
 import com.example.test.R
 import com.example.test.activity.land.MusicAdapter2.Companion.BASIC_ITEM_WIDTH
 import com.example.test.activity.land.MusicAdapter2.Companion.BASIC_LEFT_SPACE
+import com.example.test.activity.land.MusicAdapter2.MusicViewHolder
 import com.example.test.databinding.ActivityLandBinding
 import com.example.test.utils.DimensionUtils
+import com.example.test.utils.calculateFlingVelocity
+import com.example.test.utils.getChildViewLeftRelativeToRecyclerView
 import com.example.test.utils.smoothScrollToPositionWithOffset
 
 
@@ -25,6 +30,10 @@ import com.example.test.utils.smoothScrollToPositionWithOffset
  */
 class LandActivity3 : FragmentActivity() {
 
+    companion object {
+        const val TRANS_TO_LIST_ANIM_TIME = 600L
+    }
+
     private lateinit var adapter: MusicAdapter2
     private lateinit var recyclerView: TouchInterceptorRecyclerView
     private val pageSnapHelper = CustomPagerSnapHelper2()
@@ -33,9 +42,13 @@ class LandActivity3 : FragmentActivity() {
     }
     private val handler = Handler(Looper.getMainLooper())
     private var binding: ActivityLandBinding? = null
+    private val customItemDecoration = CustomItemDecoration()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 隐藏状态栏
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN);
         val local = ActivityLandBinding.inflate(LayoutInflater.from(this))
         binding = local
         setContentView(local.root)
@@ -69,6 +82,11 @@ class LandActivity3 : FragmentActivity() {
 
         // 设置适配器
         recyclerView.adapter = adapter
+        recyclerView.onLongTouchListener = {
+            if (adapter.interactiveStatus == ListState.SwitchMusic) {
+                transStatus(ListState.TransToList, adapter.currentPosition)
+            }
+        }
 
         // 应用 SnapHelper
         pageSnapHelper.setAdapter(adapter)
@@ -88,6 +106,7 @@ class LandActivity3 : FragmentActivity() {
         binding?.root?.setOnClickListener(null)
         binding?.root?.isClickable = false
         leftOffsetLayoutManager.setAttachEnabled(false)
+        recyclerView.removeItemDecoration(customItemDecoration)
         when (status) {
             ListState.SwitchMusic -> {
                 pageSnapHelper.attachToRecyclerView(recyclerView)
@@ -96,44 +115,40 @@ class LandActivity3 : FragmentActivity() {
             ListState.TransToList -> {
                 pageSnapHelper.attachToRecyclerView(null)
 
-                // 创建一个FloatValueHolder来保存当前值
-                val valueHolder = FloatValueHolder(DimensionUtils.getFullScreenWidth().toFloat())
+                // 开启转场时，增加一个加速度让列表自然滚动
+                val endMargin = recyclerView.getChildViewLeftRelativeToRecyclerView((recyclerView.findViewHolderForAdapterPosition(adapter.currentPosition) as MusicViewHolder).binding.imgCover)
+                val distance = endMargin - BASIC_LEFT_SPACE
+                var velocityX = calculateFlingVelocity(distance, 500)
+                Log.d("renderTransToList", "onAnimationEnd distance:${distance}, velocityX:${velocityX}")
+                if (distance != 0) {
+                    recyclerView.fling(-velocityX, 0)
+                }
 
                 // 创建SpringAnimation动画
-                val springAnimation = SpringAnimation(valueHolder)
-
-                // 配置SpringForce
-                val springForce = SpringForce(BASIC_ITEM_WIDTH.toFloat()).apply {
-                    // 设置阻尼比 - 控制振荡
-                    dampingRatio = 0.783f
-
-                    // 设置刚度 - 控制速度
-                    stiffness = 132f
-                }
-
-                // 为动画设置SpringForce
-                springAnimation.spring = springForce
-
+                val valueAnimator = ValueAnimator.ofInt(DimensionUtils.getFullScreenWidth(), BASIC_ITEM_WIDTH)
+                valueAnimator.duration = TRANS_TO_LIST_ANIM_TIME
                 // 监听动画更新
-                springAnimation.addUpdateListener { _, value, _ ->
-                    // 更新UI显示当前值
-                    val roundedValue = value.toInt()
-                    Log.d("SpringAnimation", "Current value: $value")
-                    adapter.renderTransToList(roundedValue)
+                valueAnimator.interpolator = DecelerateInterpolator()
+
+                // 添加动画更新监听器
+                valueAnimator.addUpdateListener { animation ->
+                    val animatedValue = animation.animatedValue as Int
+                    adapter.renderTransToList(animatedValue, distance == 0)
                 }
 
-                // 动画结束监听
-                springAnimation.addEndListener { _, _, _, _ ->
-                    Log.d("SpringAnimation", "Animation ended")
-                    transStatus(ListState.ListCompletely, clickPos)
-                }
+                // 添加动画生命周期监听器
+                valueAnimator.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        transStatus(ListState.ListCompletely, clickPos)
+                    }
+                })
 
                 // 启动动画
-                springAnimation.start()
+                valueAnimator.start()
             }
 
             ListState.ListCompletely -> {
-                leftOffsetLayoutManager.setAttachEnabled(true)
+                leftOffsetLayoutManager.setAttachEnabled(false)
                 binding?.root?.setOnClickListener {
                     transStatus(ListState.ListTransToSwitchScrollToTarget, adapter.currentPosition)
                 }

@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import kotlin.math.abs
 
 class TouchInterceptorRecyclerView @JvmOverloads constructor(
     context: Context,
@@ -19,7 +20,6 @@ class TouchInterceptorRecyclerView @JvmOverloads constructor(
 
     private var handleImageViewId: Int = 0
     private var interceptedByHandle: Boolean = false
-    private var longTouchTriggered: Boolean = false
 
     // 长按监听回调
     var onLongTouchListener: (() -> Unit)? = null
@@ -31,15 +31,15 @@ class TouchInterceptorRecyclerView @JvmOverloads constructor(
     private val longTouchHandler = Handler(Looper.getMainLooper())
     private val longTouchRunnable = Runnable {
         // 检查当前触摸的把手视图
-        currentTouchPoint?.let { point ->
-            longTouchTriggered = true
+        if ((abs(currentX - initX)) > 10) {
             onLongTouchListener?.invoke()
             Log.d("TouchInterceptorRecyclerView", "Long touch detected on handle view")
         }
     }
 
     // 存储当前触摸点的位置
-    private var currentTouchPoint: Pair<Float, Float>? = null
+    private var initX = 0f
+    private var currentX = 0f
 
     fun setHandleImageViewId(imageViewId: Int) {
         this.handleImageViewId = imageViewId
@@ -52,10 +52,9 @@ class TouchInterceptorRecyclerView @JvmOverloads constructor(
 
                 if (interceptedByHandle) {
                     // 保存当前触摸点
-                    currentTouchPoint = Pair(e.x, e.y)
-
+                    initX = e.x
+                    currentX = e.x
                     // 设置长按检测
-                    longTouchTriggered = false
                     longTouchHandler.postDelayed(longTouchRunnable, LONG_TOUCH_THRESHOLD)
                 }
 
@@ -66,13 +65,14 @@ class TouchInterceptorRecyclerView @JvmOverloads constructor(
             MotionEvent.ACTION_MOVE -> {
                 // 移动过程中保持更新触摸点位置
                 if (interceptedByHandle) {
-                    currentTouchPoint = Pair(e.x, e.y)
+                    currentX = e.x
                 }
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 // 移除长按检测
                 longTouchHandler.removeCallbacks(longTouchRunnable)
-                currentTouchPoint = null
+                initX = 0f
+                currentX = 0f
             }
         }
 
@@ -83,13 +83,14 @@ class TouchInterceptorRecyclerView @JvmOverloads constructor(
         when (e.actionMasked) {
             MotionEvent.ACTION_MOVE -> {
                 if (interceptedByHandle) {
-                    currentTouchPoint = Pair(e.x, e.y)
+                    currentX = e.x
                 }
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 // 移除长按检测
                 longTouchHandler.removeCallbacks(longTouchRunnable)
-                currentTouchPoint = null
+                initX = 0f
+                currentX = 0f
             }
         }
 

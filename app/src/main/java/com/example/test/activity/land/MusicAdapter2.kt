@@ -119,21 +119,21 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
         val vh = recyclerView.getChildViewHolder(child) as? MusicViewHolder
         vh ?: return
         if (child.left > BASIC_LEFT_SPACE + BASIC_ITEM_WIDTH) {
-            vh.binding.imgCover.scaleX = 0.9f
-            vh.binding.imgCover.scaleY = 0.9f
+            vh.binding.imgCover.scaleX = 1f
+            vh.binding.imgCover.scaleY = 1f
             vh.binding.root.alpha = 1f
         } else if (child.left >= BASIC_LEFT_SPACE) {
             // 计算当前item相对于RecyclerView左边的位置
             val scale = 0.9f + 0.1f * (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE - child.left) / BASIC_ITEM_WIDTH
             // 应用缩放
-            vh.binding.imgCover.scaleX = scale
-            vh.binding.imgCover.scaleY = scale
+            vh.binding.imgCover.scaleX = 1f
+            vh.binding.imgCover.scaleY = 1f
             vh.binding.root.alpha = 1f
         } else if (child.left < BASIC_LEFT_SPACE) {
             var alpha = 1f + 0.4f * (child.left - BASIC_LEFT_SPACE) / (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE)
             var scale = 1f + 0.1f * (child.left - BASIC_LEFT_SPACE) / (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE)
-            vh.binding.imgCover.scaleX = scale
-            vh.binding.imgCover.scaleY = scale
+            vh.binding.imgCover.scaleX = 1f
+            vh.binding.imgCover.scaleY = 1f
             vh.binding.root.alpha = alpha
         }
     }
@@ -161,14 +161,17 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
         notifyDataSetChanged()
     }
 
-    fun renderTransToList(animatedWidth: Int) {
+    fun renderTransToList(animatedWidth: Int, static: Boolean = true) {
+        // 目标位置宽度变化时，会自动向左靠，因此需要不断计算左靠的距离，并抵消它
+        val ratio = (animatedWidth - BASIC_ITEM_WIDTH) / (DimensionUtils.getFullScreenWidth() - BASIC_ITEM_WIDTH).toFloat()
+        var width = animatedWidth
+
         for (i in 0 until recyclerView.childCount) {
             val child = recyclerView.getChildAt(i)
             val vh = recyclerView.findContainingViewHolder(child) as? MusicViewHolder
             vh ?: continue
             val position = recyclerView.getChildAdapterPosition(child)
             if (position == currentPosition) {
-                var width = animatedWidth
                 if (position == 0) {
                     if (width < BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE) {
                         vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE
@@ -177,25 +180,26 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                     }
                     vh.binding.imgCover.setMarginLeft(BASIC_LEFT_SPACE)
                 } else {
-                    // 目标位置宽度变化时，会自动向左靠，因此需要不断计算左靠的距离，并抵消它
-                    val ratio = (animatedWidth - BASIC_ITEM_WIDTH) / (DimensionUtils.getFullScreenWidth() - BASIC_ITEM_WIDTH).toFloat()
                     val leftMargin = (BASIC_LEFT_SPACE * ratio).toInt()
-                    Log.d("SpringAnimation", "ratio: $ratio")
                     vh.binding.imgCover.setMarginLeft(leftMargin)
-                    val scrollDistance = BASIC_LEFT_SPACE - leftMargin
-                    (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, scrollDistance)
-
-
+                    if (static) {
+                        val scrollDistance = BASIC_LEFT_SPACE - leftMargin
+                        (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, scrollDistance)
+                    }
                     vh.binding.root.updateLayoutParams { this.width = width  }
-                    Log.d(TAG, "scrollDistance=${scrollDistance}, newWidth=${width}, rootWidth=${vh.binding.root.width}，leftMargin=$leftMargin")
+                    Log.d("renderTransToList", "ratio: $ratio, newWidth=${width}, rootWidth=${vh.binding.root.width}，leftMargin=$leftMargin, originLeft=${recyclerView.tag}")
                 }
             } else {
                 if (position != 0) {
-                    if (vh.binding.root.width != BASIC_ITEM_WIDTH) {
-                        vh.binding.root.layoutParams.width = BASIC_ITEM_WIDTH
+                    if (vh.binding.root.width >= BASIC_ITEM_WIDTH) {
+                        vh.binding.root.updateLayoutParams { this.width = width  }
                     }
-                    if (vh.binding.imgCover.marginLeft != 0) {
-                        vh.binding.imgCover.setMarginLeft(0)
+                    if (position < currentPosition) {
+                        vh.binding.imgCover.setMarginLeft(width - BASIC_ITEM_WIDTH)
+                    } else {
+                        if (vh.binding.imgCover.marginLeft != 0) {
+                            vh.binding.imgCover.setMarginLeft(0)
+                        }
                     }
                 } else {
                     if (vh.binding.root.width != (BASIC_ITEM_WIDTH + BASIC_LEFT_SPACE)) {
@@ -337,8 +341,11 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                 (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, 0)
             }
         }
-        binding.clickDelegateSpace.circleInLongClickEnable = interactiveStatus == ListState.SwitchMusic
         Log.d(TAG, "fixWidthAndMargin, position=$position, curPosition=$curPosition, interactiveStatus=$interactiveStatus")
+    }
+
+    fun isRecyclerViewEnable(): Boolean {
+        return true
     }
 
     inner class MusicViewHolder(
@@ -371,10 +378,6 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
             binding.clickDelegateSpace.onCircleOutClickListener = {
                 onItemCircleOutClick.invoke(music, position)
             }
-        }
-
-        fun setCircleInLongClickEnable(enable: Boolean) {
-            binding.clickDelegateSpace.circleInLongClickEnable = enable
         }
     }
 }
