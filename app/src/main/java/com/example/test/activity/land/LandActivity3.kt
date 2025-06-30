@@ -1,9 +1,13 @@
 package com.example.test.activity.land
 
 import android.animation.ValueAnimator
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.WindowManager
@@ -47,8 +51,10 @@ class LandActivity3 : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // 隐藏状态栏
-        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        );
         val local = ActivityLandBinding.inflate(LayoutInflater.from(this))
         binding = local
         setContentView(local.root)
@@ -60,25 +66,45 @@ class LandActivity3 : FragmentActivity() {
 
 
         // 初始化适配器
-        adapter = MusicAdapter2(recyclerView, onCircleInItemClick = { music, position ->
-            // 处理item点击事件
+        adapter = MusicAdapter2(
+            recyclerView, onCircleInItemClick = { music, position ->
+                // 处理item点击事件
 //            Toast.makeText(
 //                ApplicationWrapper.instance,
 //                "Selected: ${music.title}",
 //                Toast.LENGTH_SHORT
 //            ).show()
-            adapter.currentPosition = position
-            if (adapter.interactiveStatus == ListState.SwitchMusic) {
-                if (position == adapter.currentPosition) {
-                    transStatus(ListState.TransToList, position)
+                adapter.currentPosition = position
+                if (adapter.interactiveStatus == ListState.SwitchMusic) {
+                    if (position == adapter.currentPosition) {
+                        transStatus(ListState.TransToList, position)
+                    }
+                } else if (adapter.interactiveStatus == ListState.ListCompletely) {
+                    transStatus(ListState.ListTransToSwitchSmoothScrollToTarget, position)
                 }
-            } else if (adapter.interactiveStatus == ListState.ListCompletely) {
-                transStatus(ListState.ListTransToSwitchSmoothScrollToTarget, position)
-            }
 
-        }, onItemCircleOutClick = { music, position ->
-            transStatus(ListState.ListTransToSwitchScrollToTarget, adapter.currentPosition)
-        },
+            },
+            onItemCircleOutClick = { music, position ->
+                transStatus(ListState.ListTransToSwitchScrollToTarget, adapter.currentPosition)
+            },
+            standardLeftPosInListCompletely = { music, enable ->
+                // 需要在AndroidManifest.xml添加权限
+                val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    // 触觉反馈效果 - 点击效果
+                    val effect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
+                    vibrator.vibrate(effect)
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    // Android 8.0及以上
+                    val effect = VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE)
+                    vibrator.vibrate(effect)
+                } else {
+                    // 兼容旧版本
+                    @Suppress("DEPRECATION")
+                    vibrator.vibrate(200)
+                }
+            },
             onSwitchToTransListByScrollDistance = {
                 if (adapter.interactiveStatus == ListState.SwitchMusic) {
                     transStatus(ListState.TransToList, adapter.currentPosition)
@@ -121,13 +147,16 @@ class LandActivity3 : FragmentActivity() {
                 pageSnapHelper.attachToRecyclerView(null)
 
                 // 开启转场时，增加一个加速度让列表自然滚动
-                val endMargin = recyclerView.getChildViewLeftRelativeToRecyclerView((recyclerView.findViewHolderForAdapterPosition(adapter.currentPosition) as MusicViewHolder).binding.imgCover)
+                val endMargin = recyclerView.getChildViewLeftRelativeToRecyclerView(
+                    (recyclerView.findViewHolderForAdapterPosition(adapter.currentPosition) as MusicViewHolder).binding.imgCover
+                )
                 val distance = endMargin - BASIC_LEFT_SPACE
                 val needSupplyScroll = distance == 0
 
                 if (distance > 0) {
                     // 手指向右滑动进转场使用贝瑟尔曲线，同时根据曲线列表主动向右滑动模拟跟手效果
-                    val valueAnimator = ValueAnimator.ofInt(DimensionUtils.getFullScreenWidth(), BASIC_ITEM_WIDTH)
+                    val valueAnimator =
+                        ValueAnimator.ofInt(DimensionUtils.getFullScreenWidth(), BASIC_ITEM_WIDTH)
                     valueAnimator.interpolator = EaseCubicInterpolator(0.27f, 0.19f, 0.39f, 1f)
                     valueAnimator.duration = 250
                     valueAnimator.addUpdateListener { animation ->
@@ -142,7 +171,8 @@ class LandActivity3 : FragmentActivity() {
                     valueAnimator.start()
                 } else {
                     // SpringAnimation动画 时间为667ms  正常左滑和点击进转场使用该动画
-                    val valueHolder = FloatValueHolder(DimensionUtils.getFullScreenWidth().toFloat())
+                    val valueHolder =
+                        FloatValueHolder(DimensionUtils.getFullScreenWidth().toFloat())
                     val springAnimation = SpringAnimation(valueHolder)
                     val springForce = SpringForce(BASIC_ITEM_WIDTH.toFloat()).apply {
                         if (needSupplyScroll) {
@@ -216,7 +246,14 @@ class LandActivity3 : FragmentActivity() {
         // 模拟从网络或数据库加载数据
         val musicList = mutableListOf<MusicInfo>()
         for (i in 1 until 100) {
-            musicList.add(MusicInfo(id = "$i", title = "Music $i", artist = "Artist $i", coverUrl = "http://p1.music.126.net/xXuvLXSk1RcD1Dx5JInIiw==/109951169612265280.jpg"))
+            musicList.add(
+                MusicInfo(
+                    id = "$i",
+                    title = "Music $i",
+                    artist = "Artist $i",
+                    coverUrl = "http://p1.music.126.net/xXuvLXSk1RcD1Dx5JInIiw==/109951169612265280.jpg"
+                )
+            )
         }
         // 提交到适配器
         adapter.setList(musicList)

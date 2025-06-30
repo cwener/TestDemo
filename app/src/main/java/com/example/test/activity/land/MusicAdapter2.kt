@@ -21,6 +21,7 @@ import kotlin.math.abs
 class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView,
                     private val onCircleInItemClick: (MusicInfo, Int) -> Unit,
                     private val onItemCircleOutClick: (MusicInfo, Int) -> Unit,
+                    val standardLeftPosInListCompletely: (MusicInfo?, Boolean) -> Unit,
                     val onSwitchToTransListByScrollDistance: () -> Unit) : RecyclerView.Adapter<MusicAdapter2.MusicViewHolder>() {
 
     companion object {
@@ -51,6 +52,8 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView,
     var toLeftOriginLeft = -1
 
     var interactiveStatus = ListState.SwitchMusic
+    // 列表完全态下的左侧黑胶盘标准位
+    var leftPosInListCompletely = RecyclerView.NO_POSITION
 
     init {
         recyclerView.setHandleImageViewId(R.id.clickDelegateSpace)
@@ -121,6 +124,15 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView,
                     // 遍历所有可见的ViewHolder
                     for (i in 0 until recyclerView.childCount) {
                         val child = recyclerView.getChildAt(i)
+                        if (child.left <= BASIC_LEFT_SPACE && child.left > -(BASIC_ITEM_WIDTH - BASIC_LEFT_SPACE)) {
+                            // 每个黑胶盘滑过标准盘位置时更新位置
+                            val newPos = recyclerView.getChildAdapterPosition(child)
+                            if (newPos != leftPosInListCompletely) {
+                                standardLeftPosInListCompletely.invoke(getItem(newPos), true)
+                                leftPosInListCompletely = newPos
+                                Log.d("ListCompletelyScroll", "leftPosInListCompletely=$leftPosInListCompletely")
+                            }
+                        }
                         setScaleAndAlpha(child)
                     }
                 }

@@ -4,6 +4,7 @@
 
     <!-- 在这里添加权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
         android:name=".activity.MyApplication"
@@ -33,7 +34,6 @@
             android:name=".activity.acoptionstest.ActivityC"
             android:theme="@style/AppTheme.TranslucentTheme" />
         <activity android:name=".activity.land.LandActivity" android:screenOrientation="sensorLandscape"/>
-        <activity android:name=".activity.land.LandActivity2" android:screenOrientation="sensorLandscape"/>
         <activity android:name=".activity.land.LandActivity3" android:screenOrientation="sensorLandscape"/>
     </application>
 
