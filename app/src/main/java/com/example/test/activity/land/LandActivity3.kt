@@ -1,7 +1,5 @@
 package com.example.test.activity.land
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.os.Bundle
 import android.os.Handler
@@ -9,8 +7,11 @@ import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.WindowManager
-import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
+import androidx.core.animation.addListener
+import androidx.dynamicanimation.animation.FloatValueHolder
+import androidx.dynamicanimation.animation.SpringAnimation
+import androidx.dynamicanimation.animation.SpringForce
 import androidx.fragment.app.FragmentActivity
 import com.example.test.R
 import com.example.test.activity.land.MusicAdapter2.Companion.BASIC_ITEM_WIDTH
@@ -18,7 +19,6 @@ import com.example.test.activity.land.MusicAdapter2.Companion.BASIC_LEFT_SPACE
 import com.example.test.activity.land.MusicAdapter2.MusicViewHolder
 import com.example.test.databinding.ActivityLandBinding
 import com.example.test.utils.DimensionUtils
-import com.example.test.utils.calculateFlingVelocity
 import com.example.test.utils.getChildViewLeftRelativeToRecyclerView
 import com.example.test.utils.smoothScrollToPositionWithOffset
 
@@ -78,7 +78,12 @@ class LandActivity3 : FragmentActivity() {
 
         }, onItemCircleOutClick = { music, position ->
             transStatus(ListState.ListTransToSwitchScrollToTarget, adapter.currentPosition)
-        })
+        },
+            onSwitchToTransListByScrollDistance = {
+                if (adapter.interactiveStatus == ListState.SwitchMusic) {
+                    transStatus(ListState.TransToList, adapter.currentPosition)
+                }
+            })
 
         // 设置适配器
         recyclerView.adapter = adapter
@@ -118,37 +123,51 @@ class LandActivity3 : FragmentActivity() {
                 // 开启转场时，增加一个加速度让列表自然滚动
                 val endMargin = recyclerView.getChildViewLeftRelativeToRecyclerView((recyclerView.findViewHolderForAdapterPosition(adapter.currentPosition) as MusicViewHolder).binding.imgCover)
                 val distance = endMargin - BASIC_LEFT_SPACE
-                var velocityX = calculateFlingVelocity(distance, 500)
-                Log.d("renderTransToList", "onAnimationEnd distance:${distance}, velocityX:${velocityX}")
-                if (distance != 0) {
-                    recyclerView.fling(-velocityX, 0)
-                }
+                val needSupplyScroll = distance == 0
 
-                // 创建SpringAnimation动画
-                val valueAnimator = ValueAnimator.ofInt(DimensionUtils.getFullScreenWidth(), BASIC_ITEM_WIDTH)
-                valueAnimator.duration = TRANS_TO_LIST_ANIM_TIME
-                // 监听动画更新
-                valueAnimator.interpolator = DecelerateInterpolator()
+                if (distance > 0) {
+                    // 手指向右滑动进转场使用贝瑟尔曲线，同时根据曲线列表主动向右滑动模拟跟手效果
+                    val valueAnimator = ValueAnimator.ofInt(DimensionUtils.getFullScreenWidth(), BASIC_ITEM_WIDTH)
+                    valueAnimator.interpolator = EaseCubicInterpolator(0.27f, 0.19f, 0.39f, 1f)
+                    valueAnimator.duration = 250
+                    valueAnimator.addUpdateListener { animation ->
+                        val animatedValue = animation.animatedValue as Int
+                        adapter.renderTransToList(animatedValue, needSupplyScroll)
+                    }
 
-                // 添加动画更新监听器
-                valueAnimator.addUpdateListener { animation ->
-                    val animatedValue = animation.animatedValue as Int
-                    adapter.renderTransToList(animatedValue, distance == 0)
-                }
-
-                // 添加动画生命周期监听器
-                valueAnimator.addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
+                    valueAnimator.addListener(onEnd = {
+                        transStatus(ListState.ListCompletely, clickPos)
+                    })
+                    // 开始动画
+                    valueAnimator.start()
+                } else {
+                    // SpringAnimation动画 时间为667ms  正常左滑和点击进转场使用该动画
+                    val valueHolder = FloatValueHolder(DimensionUtils.getFullScreenWidth().toFloat())
+                    val springAnimation = SpringAnimation(valueHolder)
+                    val springForce = SpringForce(BASIC_ITEM_WIDTH.toFloat()).apply {
+                        if (needSupplyScroll) {
+                            dampingRatio = 0.93f
+                            stiffness = 154f
+                        } else {
+                            dampingRatio = 0.783f
+                            stiffness = 132f
+                        }
+                    }
+                    springAnimation.spring = springForce
+                    springAnimation.addUpdateListener { _, value, _ ->
+                        // 更新UI显示当前值
+                        val roundedValue = value.toInt()
+                        adapter.renderTransToList(roundedValue, needSupplyScroll)
+                    }
+                    springAnimation.addEndListener { _, _, _, _ ->
                         transStatus(ListState.ListCompletely, clickPos)
                     }
-                })
-
-                // 启动动画
-                valueAnimator.start()
+                    springAnimation.start()
+                }
             }
 
             ListState.ListCompletely -> {
-                leftOffsetLayoutManager.setAttachEnabled(false)
+                leftOffsetLayoutManager.setAttachEnabled(true)
                 binding?.root?.setOnClickListener {
                     transStatus(ListState.ListTransToSwitchScrollToTarget, adapter.currentPosition)
                 }

@@ -18,13 +18,18 @@ import com.example.test.utils.setMarginLeft
 import kotlin.math.abs
 
 
-class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val onCircleInItemClick: (MusicInfo, Int) -> Unit, private val onItemCircleOutClick: (MusicInfo, Int) -> Unit) : RecyclerView.Adapter<MusicAdapter2.MusicViewHolder>() {
+class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView,
+                    private val onCircleInItemClick: (MusicInfo, Int) -> Unit,
+                    private val onItemCircleOutClick: (MusicInfo, Int) -> Unit,
+                    val onSwitchToTransListByScrollDistance: () -> Unit) : RecyclerView.Adapter<MusicAdapter2.MusicViewHolder>() {
 
     companion object {
         val BASIC_RIGHT_SPACE = DimensionUtils.getFullScreenWidth() - DimensionUtils.dpToPx(400f)
         val BASIC_LEFT_SPACE = DimensionUtils.dpToPx(100f)
         val BASIC_SPACE = DimensionUtils.dpToPx(10f)
         val BASIC_ITEM_WIDTH = DimensionUtils.dpToPx(300f)
+        // 切歌态向右滑触发进入列表转场的距离
+        val rightScrollSwitchToTransListLimitDistance = BASIC_ITEM_WIDTH - BASIC_LEFT_SPACE
         const val TAG = "MusicAdapter"
 
         const val TO_LEFT = 1
@@ -100,6 +105,14 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                                 vh?.let {
                                     Log.d(TAG, "onChildAttachedToWindow, position=$position")
                                     fixWidthAndMargin(position, it.binding, currentPosition)
+                                }
+
+                                val curVH = recyclerView.findViewHolderForAdapterPosition(currentPosition) as? MusicViewHolder
+                                curVH?.let {
+                                    // 切歌态下，向右滑动超出一定距离则触发转场进列表
+                                    if (it.binding.root.left > rightScrollSwitchToTransListLimitDistance) {
+                                        onSwitchToTransListByScrollDistance.invoke()
+                                    }
                                 }
                             }
                         }
@@ -185,6 +198,22 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                     if (static) {
                         val scrollDistance = BASIC_LEFT_SPACE - leftMargin
                         (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, scrollDistance)
+                    } else {
+                        if (ratio == 1f) {
+                            recyclerView.tag = vh.binding.root.left
+                            recyclerView.setTag(R.id.recyclerView, 0)
+                        }
+                        val supplyInstance = recyclerView.tag as? Int ?: 0
+                        if (supplyInstance > 0) {
+                            var scrollDistance = BASIC_LEFT_SPACE - leftMargin + supplyInstance + ((1 - ratio) * supplyInstance / 2.5).toInt()
+                            val lastScrollDistance = recyclerView.getTag(R.id.recyclerView) as? Int ?: 0
+                            if (lastScrollDistance > scrollDistance) {
+                                scrollDistance = lastScrollDistance
+                            }
+                            (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, scrollDistance)
+                            recyclerView.setTag(R.id.recyclerView, scrollDistance)
+                            Log.d("scrollDistance", "ratio:$ratio, supplyInstance=${supplyInstance}, left=${vh.binding.root.left}, scrollDistance:$scrollDistance")
+                        }
                     }
                     vh.binding.root.updateLayoutParams { this.width = width  }
                     Log.d("renderTransToList", "ratio: $ratio, newWidth=${width}, rootWidth=${vh.binding.root.width}，leftMargin=$leftMargin, originLeft=${recyclerView.tag}")
@@ -341,11 +370,11 @@ class MusicAdapter2(val recyclerView: TouchInterceptorRecyclerView, private val 
                 (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(currentPosition, 0)
             }
         }
-        Log.d(TAG, "fixWidthAndMargin, position=$position, curPosition=$curPosition, interactiveStatus=$interactiveStatus")
+        Log.d("fixWidthAndMargin", "fixWidthAndMargin, position=$position, curPosition=$curPosition, interactiveStatus=$interactiveStatus")
     }
 
     fun isRecyclerViewEnable(): Boolean {
-        return true
+        return interactiveStatus != ListState.TransToList
     }
 
     inner class MusicViewHolder(

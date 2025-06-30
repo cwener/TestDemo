@@ -94,7 +94,9 @@ class TouchInterceptorRecyclerView @JvmOverloads constructor(
             }
         }
 
-        return if (interceptedByHandle) super.onTouchEvent(e) else false
+        val gestureEnable = (adapter as MusicAdapter2).isRecyclerViewEnable()
+
+        return if (interceptedByHandle && gestureEnable) super.onTouchEvent(e) else false
     }
 
     private fun isTouchOnHandle(x: Float, y: Float): Boolean {

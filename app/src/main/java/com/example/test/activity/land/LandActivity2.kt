@@ -50,7 +50,11 @@ class LandActivity2: FragmentActivity() {
             viewHolder?.let {
 //                animateViewWidth(it.itemView)
             }
-        })
+        },
+            onSwitchToTransListByScrollDistance = {
+                if (adapter.interactiveStatus == ListState.SwitchMusic) {
+                }
+            })
 
         // 设置适配器
         recyclerView.adapter = adapter
