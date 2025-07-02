@@ -13,11 +13,18 @@
         android:clipChildren="false"
         tools:context=".activity.land.LandActivity">
 
+        <com.example.test.activity.land.TouchInterceptorRecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false" />
+
         <FrameLayout
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
             android:layout_marginEnd="200dp"
             android:clipChildren="false"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -28,14 +35,6 @@
                 android:layout_height="150dp"
                 android:background="@color/design_default_color_error" />
         </FrameLayout>
-
-
-        <com.example.test.activity.land.TouchInterceptorRecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipChildren="false"
-            android:background="#660cf300" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
