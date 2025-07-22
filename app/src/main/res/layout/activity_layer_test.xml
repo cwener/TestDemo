@@ -94,5 +94,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/goFontTest" />
 
+        <TextView
+            android:id="@+id/goTouchTest"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/cardview_dark_background"
+            android:gravity="center"
+            android:text="@string/goTouchTest"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/goLandTest" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

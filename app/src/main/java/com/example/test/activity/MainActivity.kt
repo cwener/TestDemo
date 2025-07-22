@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.test.R
 import com.example.test.activity.acoptionstest.ActivityA
 import com.example.test.activity.land.LandActivity3
+import com.example.test.activity.touch.TouchActivity
 import com.example.test.databinding.ActivityLayerTestBinding
 import com.example.test.view.DSLNotificationDialog
 import com.facebook.drawee.backends.pipeline.Fresco
@@ -46,6 +47,10 @@ class MainActivity : AppCompatActivity() {
 
             goLandTest.setOnClickListener {
                 startActivity(Intent(this@MainActivity, LandActivity3::class.java))
+            }
+            
+            goTouchTest.setOnClickListener {
+                startActivity(Intent(this@MainActivity, TouchActivity::class.java))
             }
         }
     }

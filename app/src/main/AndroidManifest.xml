@@ -35,6 +35,7 @@
             android:theme="@style/AppTheme.TranslucentTheme" />
         <activity android:name=".activity.land.LandActivity" android:screenOrientation="sensorLandscape"/>
         <activity android:name=".activity.land.LandActivity3" android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".activity.touch.TouchActivity" />
     </application>
 
 </manifest>

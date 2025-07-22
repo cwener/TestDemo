@@ -6,4 +6,5 @@
     <string name="goTrans">goTrans</string>
     <string name="goDialog">goDialog</string>
     <string name="click_go_liveroom">点击进入直播间</string>
+    <string name="goTouchTest">触摸事件测试</string>
 </resources>
