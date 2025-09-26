@@ -13,13 +13,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.test.R
 import java.util.Random
+import java.util.concurrent.LinkedBlockingQueue
 
 /**
  * @author chengwen
  * @createTime 2023/5/23
  **/
 class FltZanAtmosphereView : FrameLayout {
-    
+
+    private val iconViewCache = LinkedBlockingQueue<ImageView>(10)
     private lateinit var zanIcon: ImageView
     private lateinit var zanCount: TextView
     private var zanCountValue = 128
@@ -65,24 +67,30 @@ class FltZanAtmosphereView : FrameLayout {
         zanCount.text = zanCountValue.toString()
     }
     
-    private fun triggerAtmosphereEffect() {
-        // 创建36x36的图标
-        val iconView = ImageView(context).apply {
+    private fun createIconView(): ImageView {
+        return ImageView(context).apply {
             layoutParams = LayoutParams(36.dpToPx(), 36.dpToPx())
             scaleType = ImageView.ScaleType.FIT_CENTER
+        }
+    }
 
-            // 随机选择call、good、heart中的一个图片
+    private fun triggerAtmosphereEffect() {
+        // 从缓存池获取或创建新的ImageView
+        val iconView = iconViewCache.poll() ?: createIconView()
+
+        // 重置并设置iconView的属性
+        iconView.apply {
+            alpha = 0f
+            scaleX = 0f
+            scaleY = 0f
+
+            // 随机选择图片
             val images = listOf(
                 R.drawable.icon_lt_atmosphere_zan_call,
                 R.drawable.icon_lt_atmosphere_zan_good,
                 R.drawable.icon_lt_atmosphere_zan_heart
             )
             setImageResource(images.random())
-
-            // 设置初始状态
-            alpha = 0f
-            scaleX = 0f
-            scaleY = 0f
         }
 
         // 添加到布局中
@@ -135,6 +143,7 @@ class FltZanAtmosphereView : FrameLayout {
         animatorSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
                 removeView(iconView)
+                iconViewCache.offer(iconView)
             }
         })
 
