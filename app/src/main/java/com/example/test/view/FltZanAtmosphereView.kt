@@ -111,20 +111,24 @@ class FltZanAtmosphereView : FrameLayout {
         // 添加到布局中
         addView(iconView)
 
-        // 获取容器尺寸
-        val containerHeight = height.toFloat()
-        val containerWidth = width.toFloat()
+        // 获取图标尺寸
         val iconSize = 36.dpToPx().toFloat()
 
-        // 将图标初始位置设置在容器底部中心
-        iconView.translationX = (containerWidth - iconSize) / 2f
-        iconView.translationY = containerHeight - iconSize
+        // 将图标初始位置设置在 zanIcon 顶部中心
+        val startX = zanIcon.x + (zanIcon.width - iconSize) / 2f
+        val startY = zanIcon.y
+        iconView.translationX = startX
+        iconView.translationY = startY
 
         // 创建动画集
         val animatorSet = AnimatorSet()
 
-        // 第一阶段动画：从底部上升到50%高度，淡入并放大
-        val translateY1 = ObjectAnimator.ofFloat(iconView, "translationY", containerHeight - iconSize, containerHeight * 0.5f)
+        // 定义动画路径
+        val endY1 = startY - height * 0.25f
+        val endY2 = endY1 - height * 0.25f
+
+        // 第一阶段动画：从zanIcon位置上升，淡入并放大
+        val translateY1 = ObjectAnimator.ofFloat(iconView, "translationY", startY, endY1)
         val alpha1 = ObjectAnimator.ofFloat(iconView, "alpha", 0f, 1f)
         val scale1X = ObjectAnimator.ofFloat(iconView, "scaleX", 0f, 1f)
         val scale1Y = ObjectAnimator.ofFloat(iconView, "scaleY", 0f, 1f)
@@ -134,14 +138,14 @@ class FltZanAtmosphereView : FrameLayout {
             duration = 500
         }
 
-        // 第二阶段动画：从50%高度上升到顶部，淡出并缩小，同时随机水平偏移
-        val translateY2 = ObjectAnimator.ofFloat(iconView, "translationY", containerHeight * 0.5f, 0f)
+        // 第二阶段动画：继续上升，淡出并缩小，同时随机水平偏移
+        val translateY2 = ObjectAnimator.ofFloat(iconView, "translationY", endY1, endY2)
         val alpha2 = ObjectAnimator.ofFloat(iconView, "alpha", 1f, 0f)
         val scale2X = ObjectAnimator.ofFloat(iconView, "scaleX", 1f, 0f)
         val scale2Y = ObjectAnimator.ofFloat(iconView, "scaleY", 1f, 0f)
 
         val randomOffset = if (random.nextBoolean()) 8.dpToPx().toFloat() else -8.dpToPx().toFloat()
-        val translateX = ObjectAnimator.ofFloat(iconView, "translationX", iconView.translationX, iconView.translationX + randomOffset)
+        val translateX = ObjectAnimator.ofFloat(iconView, "translationX", startX, startX + randomOffset)
 
         val secondPhaseSet = AnimatorSet().apply {
             playTogether(translateY2, alpha2, scale2X, scale2Y, translateX)
