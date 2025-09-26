@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -26,7 +27,8 @@ class FltZanAtmosphereView : FrameLayout {
     private lateinit var zanCount: TextView
     private var zanCountValue = 128
     private val random = Random()
-    
+    private var lastClickTime: Long = 0
+
     constructor(context: Context) : super(context) {
         init()
     }
@@ -57,12 +59,25 @@ class FltZanAtmosphereView : FrameLayout {
     private fun setupClickListeners() {
         // 计数文本点击事件 - 触发氛围动效
         zanIcon.setOnClickListener {
-            zanCountValue++
-            updateZanCount()
-            triggerAtmosphereEffect()
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastClickTime > 100) {
+                lastClickTime = currentTime
+
+                // Add click animation
+                val scaleX = PropertyValuesHolder.ofFloat("scaleX", 1f, 1.2f, 1f)
+                val scaleY = PropertyValuesHolder.ofFloat("scaleY", 1f, 1.2f, 1f)
+                ObjectAnimator.ofPropertyValuesHolder(zanIcon, scaleX, scaleY).apply {
+                    duration = 100
+                    start()
+                }
+
+                zanCountValue++
+                updateZanCount()
+                triggerAtmosphereEffect()
+            }
         }
     }
-    
+
     private fun updateZanCount() {
         zanCount.text = zanCountValue.toString()
     }
