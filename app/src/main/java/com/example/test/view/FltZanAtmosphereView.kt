@@ -6,6 +6,8 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.animation.LinearInterpolator
@@ -21,12 +23,31 @@ import java.util.concurrent.LinkedBlockingQueue
  **/
 class FltZanAtmosphereView : FrameLayout {
 
-    private val iconViewCache = LinkedBlockingQueue<ImageView>(10)
+    companion object {
+        private const val ZAN_ANIMATION_DURATION = 150L
+    }
+
+    private val iconViewCache = LinkedBlockingQueue<ImageView>(12)
+    private val zanCountQueue = LinkedBlockingQueue<Int>()
     private lateinit var zanIcon: ImageView
     private var zanCountValue = 0
     private val random = Random()
     private var lastClickTime: Long = 0
     private var zanClickListener: OnClickListener? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private var remainingAnimations = 0
+
+    private val animationRunnable = object : Runnable {
+        override fun run() {
+            if (remainingAnimations > 0) {
+                triggerAtmosphereEffect()
+                remainingAnimations--
+                handler.postDelayed(this, ZAN_ANIMATION_DURATION)
+            } else {
+                processNextInQueue()
+            }
+        }
+    }
 
     constructor(context: Context) : super(context) {
         init()
@@ -42,10 +63,25 @@ class FltZanAtmosphereView : FrameLayout {
         init()
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        handler.removeCallbacksAndMessages(null)
+    }
+
     private fun init() {
         val view = LayoutInflater.from(context).inflate(R.layout.view_zan_custom, this, true)
         zanIcon = view.findViewById(R.id.zanIcon)
         setupClickListeners()
+        processNextInQueue()
+    }
+
+    private fun processNextInQueue() {
+        if (remainingAnimations <= 0) {
+            zanCountQueue.poll()?.let {
+                remainingAnimations = it
+                handler.post(animationRunnable)
+            }
+        }
     }
 
     private fun setupClickListeners() {
@@ -165,7 +201,8 @@ class FltZanAtmosphereView : FrameLayout {
 
     // 公共方法：设置点赞计数
     fun setZanCount(count: Int) {
-
+        zanCountQueue.offer(count)
+        processNextInQueue()
     }
 
     // 公共方法：获取点赞计数
