@@ -124,8 +124,8 @@ class FltZanAtmosphereView : FrameLayout {
         val animatorSet = AnimatorSet()
 
         // 定义动画路径
-        val endY1 = startY - height * 0.25f
-        val endY2 = endY1 - height * 0.25f
+        val endY1 = height / 2f - iconSize
+        val endY2 = 0f - iconSize
 
         // 第一阶段动画：从zanIcon位置上升，淡入并放大
         val translateY1 = ObjectAnimator.ofFloat(iconView, "translationY", startY, endY1)
