@@ -52,6 +52,10 @@ class MainActivity : AppCompatActivity() {
             goTouchTest.setOnClickListener {
                 startActivity(Intent(this@MainActivity, TouchActivity::class.java))
             }
+            
+            goZanTest.setOnClickListener {
+                startActivity(Intent(this@MainActivity, ZanActivity::class.java))
+            }
         }
     }
 }

@@ -7,4 +7,7 @@
     <string name="goDialog">goDialog</string>
     <string name="click_go_liveroom">点击进入直播间</string>
     <string name="goTouchTest">触摸事件测试</string>
+    <string name="goZanTest">点赞功能测试</string>
+    <string name="goZanViewDemo">自定义点赞视图</string>
+    <string name="goFltZanAtmosphere">氛围点赞视图</string>
 </resources>

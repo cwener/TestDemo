@@ -36,6 +36,8 @@
         <activity android:name=".activity.land.LandActivity" android:screenOrientation="sensorLandscape"/>
         <activity android:name=".activity.land.LandActivity3" android:screenOrientation="sensorLandscape"/>
         <activity android:name=".activity.touch.TouchActivity" />
+        <activity android:name=".activity.ZanActivity" />
+        <activity android:name=".activity.ZanViewDemoActivity" />
     </application>
 
 </manifest>
