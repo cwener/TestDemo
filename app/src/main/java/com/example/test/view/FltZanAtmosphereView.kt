@@ -11,7 +11,6 @@ import android.view.LayoutInflater
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.TextView
 import com.example.test.R
 import java.util.Random
 import java.util.concurrent.LinkedBlockingQueue
@@ -24,10 +23,10 @@ class FltZanAtmosphereView : FrameLayout {
 
     private val iconViewCache = LinkedBlockingQueue<ImageView>(10)
     private lateinit var zanIcon: ImageView
-    private lateinit var zanCount: TextView
-    private var zanCountValue = 128
+    private var zanCountValue = 0
     private val random = Random()
     private var lastClickTime: Long = 0
+    private var zanClickListener: OnClickListener? = null
 
     constructor(context: Context) : super(context) {
         init()
@@ -44,18 +43,11 @@ class FltZanAtmosphereView : FrameLayout {
     }
 
     private fun init() {
-        // 加载自定义布局
         val view = LayoutInflater.from(context).inflate(R.layout.view_zan_custom, this, true)
         zanIcon = view.findViewById(R.id.zanIcon)
-        zanCount = view.findViewById(R.id.zanCount)
-        
-        // 初始化点赞计数
-        updateZanCount()
-        
-        // 设置点击事件
         setupClickListeners()
     }
-    
+
     private fun setupClickListeners() {
         // 计数文本点击事件 - 触发氛围动效
         zanIcon.setOnClickListener {
@@ -72,16 +64,12 @@ class FltZanAtmosphereView : FrameLayout {
                 }
 
                 zanCountValue++
-                updateZanCount()
                 triggerAtmosphereEffect()
+                zanClickListener?.onClick(it)
             }
         }
     }
 
-    private fun updateZanCount() {
-        zanCount.text = zanCountValue.toString()
-    }
-    
     private fun createIconView(): ImageView {
         return ImageView(context).apply {
             layoutParams = LayoutParams(36.dpToPx(), 36.dpToPx())
@@ -169,28 +157,23 @@ class FltZanAtmosphereView : FrameLayout {
         // 启动动画
         animatorSet.start()
     }
-    
+
     // 扩展函数：dp转px
     private fun Int.dpToPx(): Int {
         return (this * context.resources.displayMetrics.density).toInt()
     }
-    
+
     // 公共方法：设置点赞计数
     fun setZanCount(count: Int) {
-        zanCountValue = count
-        updateZanCount()
+
     }
-    
+
     // 公共方法：获取点赞计数
     fun getZanCount(): Int = zanCountValue
-    
+
     // 公共方法：设置图标点击监听器
     fun setOnIconClickListener(listener: OnClickListener) {
-        zanIcon.setOnClickListener(listener)
+        this.zanClickListener = listener
     }
-    
-    // 公共方法：设置计数点击监听器
-    fun setOnCountClickListener(listener: OnClickListener) {
-        zanCount.setOnClickListener(listener)
-    }
+
 }
