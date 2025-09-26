@@ -70,7 +70,7 @@ class FltZanAtmosphereView : FrameLayout {
         val iconView = ImageView(context).apply {
             layoutParams = LayoutParams(36.dpToPx(), 36.dpToPx())
             scaleType = ImageView.ScaleType.FIT_CENTER
-            
+
             // 随机选择call、good、heart中的一个图片
             val images = listOf(
                 R.drawable.icon_lt_atmosphere_zan_call,
@@ -78,66 +78,67 @@ class FltZanAtmosphereView : FrameLayout {
                 R.drawable.icon_lt_atmosphere_zan_heart
             )
             setImageResource(images.random())
-            
+
             // 设置初始状态
             alpha = 0f
             scaleX = 0f
             scaleY = 0f
         }
-        
-        // 添加到布局中，位置在zanCount的顶部
+
+        // 添加到布局中
         addView(iconView)
-        
-//        // 获取容器高度
+
+        // 获取容器尺寸
         val containerHeight = height.toFloat()
-//
-//        // 创建动画集合
+        val containerWidth = width.toFloat()
+        val iconSize = 36.dpToPx().toFloat()
+
+        // 将图标初始位置设置在容器底部中心
+        iconView.translationX = (containerWidth - iconSize) / 2f
+        iconView.translationY = containerHeight - iconSize
+
+        // 创建动画集
         val animatorSet = AnimatorSet()
-//
-//        // 0-500ms: 从底部到50%位置，透明度0到1，大小从0到1
-        val translateY1 = ObjectAnimator.ofFloat(iconView, "translationY", 0f, -containerHeight * 0.5f)
+
+        // 第一阶段动画：从底部上升到50%高度，淡入并放大
+        val translateY1 = ObjectAnimator.ofFloat(iconView, "translationY", containerHeight - iconSize, containerHeight * 0.5f)
         val alpha1 = ObjectAnimator.ofFloat(iconView, "alpha", 0f, 1f)
         val scale1X = ObjectAnimator.ofFloat(iconView, "scaleX", 0f, 1f)
         val scale1Y = ObjectAnimator.ofFloat(iconView, "scaleY", 0f, 1f)
-//
-//        // 500-1200ms: 从50%到100%位置，透明度1到0，大小从1到0，随机左右偏移
-        val translateY2 = ObjectAnimator.ofFloat(iconView, "translationY", -containerHeight * 0.5f, -containerHeight)
-//        val alpha2 = ObjectAnimator.ofFloat(iconView, "alpha", 1f, 0f)
-//        val scale2X = ObjectAnimator.ofFloat(iconView, "scaleX", 1f, 0f)
-//        val scale2Y = ObjectAnimator.ofFloat(iconView, "scaleY", 1f, 0f)
-//
-//        // 随机左右偏移8dp
-//        val randomOffset = if (random.nextBoolean()) 8.dpToPx().toFloat() else -8.dpToPx().toFloat()
-//        val translateX = ObjectAnimator.ofFloat(iconView, "translationX", 0f, randomOffset)
-//
-//        // 设置动画时长
+
         val firstPhaseSet = AnimatorSet().apply {
-//            playTogether(translateY1, alpha1, scale1X, scale1Y)
-            playTogether(alpha1, scale1X, scale1Y)
+            playTogether(translateY1, alpha1, scale1X, scale1Y)
             duration = 500
         }
-//
-//        val secondPhaseSet = AnimatorSet().apply {
-//            playTogether(translateY2, alpha2, scale2X, scale2Y, translateX)
-//            duration = 700
-//        }
-//
-//        // 组合动画
-//        animatorSet.playSequentially(firstPhaseSet, secondPhaseSet)
-        animatorSet.playSequentially(firstPhaseSet)
 
-        // 设置线性加速器
+        // 第二阶段动画：从50%高度上升到顶部，淡出并缩小，同时随机水平偏移
+        val translateY2 = ObjectAnimator.ofFloat(iconView, "translationY", containerHeight * 0.5f, 0f)
+        val alpha2 = ObjectAnimator.ofFloat(iconView, "alpha", 1f, 0f)
+        val scale2X = ObjectAnimator.ofFloat(iconView, "scaleX", 1f, 0f)
+        val scale2Y = ObjectAnimator.ofFloat(iconView, "scaleY", 1f, 0f)
+
+        val randomOffset = if (random.nextBoolean()) 8.dpToPx().toFloat() else -8.dpToPx().toFloat()
+        val translateX = ObjectAnimator.ofFloat(iconView, "translationX", iconView.translationX, iconView.translationX + randomOffset)
+
+        val secondPhaseSet = AnimatorSet().apply {
+            playTogether(translateY2, alpha2, scale2X, scale2Y, translateX)
+            duration = 700
+        }
+
+        // 顺序播放两个阶段的动画
+        animatorSet.playSequentially(firstPhaseSet, secondPhaseSet)
+
+        // 设置线性插值器
         animatorSet.interpolator = LinearInterpolator()
 
-        // 添加动画监听器
+        // 添加动画监听器，在动画结束后移除图标
         animatorSet.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
-                // 动画结束后移除图标
                 removeView(iconView)
             }
         })
 
-        // 开始动画
+        // 启动动画
         animatorSet.start()
     }
     
