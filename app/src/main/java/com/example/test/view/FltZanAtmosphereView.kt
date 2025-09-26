@@ -25,6 +25,7 @@ class FltZanAtmosphereView : FrameLayout {
 
     companion object {
         private const val ZAN_ANIMATION_DURATION = 150L
+        private const val CACHE_CLEAR_DELAY = 1000L
     }
 
     private val iconViewCache = LinkedBlockingQueue<ImageView>(12)
@@ -49,10 +50,15 @@ class FltZanAtmosphereView : FrameLayout {
         }
     }
 
+    private val clearCacheRunnable = Runnable {
+        while (iconViewCache.size > 2) {
+            iconViewCache.poll()
+        }
+    }
+
     constructor(context: Context) : super(context) {
         init()
     }
-
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         init()
     }
@@ -82,6 +88,11 @@ class FltZanAtmosphereView : FrameLayout {
                 handler.post(animationRunnable)
             }
         }
+    }
+
+    private fun resetClearCacheTimer() {
+        handler.removeCallbacks(clearCacheRunnable)
+        handler.postDelayed(clearCacheRunnable, CACHE_CLEAR_DELAY)
     }
 
     private fun setupClickListeners() {
@@ -187,6 +198,7 @@ class FltZanAtmosphereView : FrameLayout {
             override fun onAnimationEnd(animation: Animator) {
                 removeView(iconView)
                 iconViewCache.offer(iconView)
+                resetClearCacheTimer()
             }
         })
 

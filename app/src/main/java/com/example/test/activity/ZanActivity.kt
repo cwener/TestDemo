@@ -19,7 +19,6 @@ class ZanActivity : AppCompatActivity() {
         // 初始化点赞功能
         setupZanFeature()
         binding.zanView.setZanCount(20)
-        binding.zanView.setZanCount(30)
     }
     
     private fun setupZanFeature() {
